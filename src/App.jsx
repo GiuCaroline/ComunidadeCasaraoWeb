@@ -8,6 +8,7 @@ import EditUsers from "./screens/EditUsers";
 import Eventos from "./screens/Eventos";
 import Galeria from "./screens/Galeria";
 import Escalas from "./screens/Escalas";
+import Cursos from "./screens/Cursos";
 
 export default function App() {
   const location = useLocation();
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/escalas" element={<Escalas />} />
+          <Route path="/cursos" element={<Cursos />} />
         </Routes>
       </div>
     </>
