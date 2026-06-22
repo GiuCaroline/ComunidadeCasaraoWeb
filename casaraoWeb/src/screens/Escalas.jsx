@@ -4,6 +4,15 @@ import MonthHeaderWeb from "../components/monthHeaderWeb";
 import CustomCalendarWeb from "../components/customCalendarWeb";
 import { ModalEscala } from "../components/modalEscala";
 
+const gapsAuxiliares = [
+  { id: "1", label: "Louvor", cor: "#0077ff" },
+  { id: "2", label: "Mídia", cor: "#FF0004" },
+  { id: "3", label: "Iluminação", cor: "#0077ff" },
+  { id: "4", label: "Som", cor: "#A148FF" },
+  { id: "5", label: "Diaconato", cor: "#ffe448" },
+  { id: "6", label: "Projeção", cor: "#48ff66" },
+];
+
 export default function Escalas() {
   const [escalas, setEscalas] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -18,11 +27,11 @@ export default function Escalas() {
 
   useEffect(() => {
     const fakeEscalas = [
-      { id: 1, gap: "Iluminação", cor: "#0077ff", data: "2026-07-08", escala1: "Giulia", escala2: "Wilson" },
-      { id: 2, gap: "Mídia", cor: "#FF0004", data: "2026-07-08", escala1: "Gabão", escala2: "" },
-      { id: 3, gap: "Som", cor: "#A148FF", data: "2026-07-08", escala1: "Edu", escala2: "Guilherme" },
-      { id: 4, gap: "Projeção", cor: "#48ff66", data: "2026-07-08", escala1: "Murilo", escala2: "Lincon" },
-      { id: 5, gap: "Diaconato", cor: "#ffe448", data: "2026-06-08", escala1: "Fábio", escala2: "Jovens" },
+      { id: 1, gap: "3", data: "2026-07-08", responsavel1: "Giulia", responsavel2: "Wilson", horario1: '10:30:00', horario2: '18:00:00' },
+      { id: 2, gap: "2", data: "2026-07-08", responsavel1: "Gabão", responsavel2: "", horario1: '10:00:00', horario2: '18:00:00' },
+      { id: 3, gap: "4", data: "2026-07-08", responsavel1: "Edu", responsavel2: "Guilherme", horario1: '10:00:00', horario2: '18:00:00' },
+      { id: 4, gap: "6", data: "2026-07-08", responsavel1: "Murilo", responsavel2: "Lincon", horario1: '10:00:00', horario2: '18:00:00' },
+      { id: 5, gap: "5", data: "2026-06-08", responsavel1: "Fábio", responsavel2: "Jovens", horario1: '10:00:00', horario2: '18:00:00' },
     ];
 
     setEscalas(fakeEscalas);
@@ -72,6 +81,11 @@ export default function Escalas() {
     return result;
   }
 
+  function getGapInfo(gapId) {
+    const gapEncontrado = gapsAuxiliares.find((g) => g.id === String(gapId));
+    return gapEncontrado ? gapEncontrado : { label: "Desconhecido", cor: "#000000" };
+  }
+
   const markedDays = getMarkedDays(escalas);
 
   return (
@@ -93,39 +107,43 @@ export default function Escalas() {
       />
 
       {selectedDate &&
-        filteredUsers.map((escala) => (
-          <div
-            key={escala.id}
-            className="w-[95%] bg-input dark:bg-input-dark rounded-2xl shadow-md px-4 py-2 flex justify-between items-center"
-          >
-            <div className="flex flex-col">
-              <p style={{ color: escala.cor }}>
-                {escala.gap}
-                <label className="text-preto dark:text-branco">
-                  {" "}
-                  - {getDiaDaSemanaCurto(escala.data)}
-                </label>
-              </p>
-              <p className="text-sm font-light text-preto dark:text-branco">
-                10h - {escala.escala1}
-              </p>
-              {escala.escala2 && (
-                <p className="text-sm font-light text-preto dark:text-branco">
-                  18h - {escala.escala2}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col">
-              <p className="text-sm font-light text-preto dark:text-branco">
-                {formatDate(escala.data)}
-              </p>
-            </div>
+        filteredUsers.map((escala) => {
+          const info = getGapInfo(escala.gap);
 
-            <button onClick={() => handleEdit(escala)}>
-              <PencilSimple size={30} className="text-[#01CB34]" />
-            </button>
-          </div>
-        ))}
+          return (
+            <div
+              key={escala.id}
+              className="w-[95%] bg-input dark:bg-input-dark rounded-2xl shadow-md px-4 py-2 flex justify-between items-center"
+            >
+              <div className="flex flex-col">
+                <p style={{ color: info.cor }}>
+                  {info.label}
+                  <label className="text-preto dark:text-branco">
+                    {" "}
+                    - {getDiaDaSemanaCurto(escala.data)}
+                  </label>
+                </p>
+                <p className="text-sm font-light text-preto dark:text-branco">
+                  {formataHora(escala.horario1)} - {escala.responsavel1}
+                </p>
+                {escala.responsavel2 && (
+                  <p className="text-sm font-light text-preto dark:text-branco">
+                    {formataHora(escala.horario2)} - {escala.responsavel2}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <p className="text-sm font-light text-preto dark:text-branco">
+                  {formatDate(escala.data)}
+                </p>
+              </div>
+
+              <button onClick={() => handleEdit(escala)}>
+                <PencilSimple size={30} className="text-[#01CB34]" />
+              </button>
+            </div>
+          );
+        })}
 
       <button
         onClick={() => {
@@ -142,6 +160,7 @@ export default function Escalas() {
         onClose={() => setModalVisible(false)}
         onSave={handleSaveEscala}
         escala={editingEscala}
+        titulo={editingEscala ? "Editar Escala" : "Nova Escala"}
       />
     </div>
   );
@@ -166,4 +185,22 @@ function getDiaDaSemanaCurto(dateString) {
   const diaCurto = diaCompleto.split("-")[0];
 
   return diaCurto.charAt(0).toUpperCase() + diaCurto.slice(1);
+}
+
+function formataHora(tempo) {
+  if (!tempo) return "";
+
+  const partes = tempo.split(":");
+  if (partes.length >= 2) {
+    const hora = partes[0];
+    const minuto = partes[1];
+
+    if (minuto === "00") {
+      return `${hora}h`;
+    }
+    
+    return `${hora}h${minuto}`;
+  }
+
+  return tempo;
 }
