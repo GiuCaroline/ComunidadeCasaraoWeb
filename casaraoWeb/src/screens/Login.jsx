@@ -32,7 +32,7 @@ export default function Login() {
         onSubmit={handleLogin}
         className="bg-transparent p-8 w-[400px] flex flex-col items-center mt-[5%]"
       >
-        <h1 className="text-2xl font-bold mb-[25%] text-vermelho">Login</h1>
+        <h1 className="text-2xl font-bold mb-[25%] text-vermelho dark:text-vermelho-dark">Login</h1>
 
         <Input
           texto="Email"
@@ -55,7 +55,7 @@ export default function Login() {
         <button
           type="submit"
           onClick={() => navigate("/menu")}
-          className="mt-6 bg-primary text-branco bg-vermelho py-3 px-20 rounded-full hover:opacity-90 transition"
+          className="mt-6 bg-primary text-branco bg-vermelho dark:bg-vermelho-dark py-3 px-20 rounded-full hover:opacity-90 transition"
         >
           Entrar
         </button>

@@ -133,7 +133,7 @@ export default function Usuarios() {
 
           <div className="flex gap-3">
             <button onClick={() => handleDeleteClick(user.id)}>
-              <TrashIcon size={30} className="text-vermelho" />
+              <TrashIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </button>
 
             <button onClick={() => handleEdit(user)}>

@@ -237,8 +237,8 @@ export default function EditUsers() {
       <Input texto="Pai" value={pai} onChange={setPai} />
 
       <div className="flex items-center w-full gap-2 mb-[7%]">
-        <p className="font-normal text-vermelho">Endereço</p>
-        <div className="bg-vermelho w-full h-[1px]"></div>
+        <p className="font-normal text-vermelho dark:text-vermelho-dark">Endereço</p>
+        <div className="bg-vermelho dark:bg-vermelho-dark w-full h-[1px]"></div>
       </div>
 
       <div className="flex gap-5 px-2">
@@ -263,8 +263,8 @@ export default function EditUsers() {
       <Input texto="Complemento" value={complemento} onChange={setComplemento} />
         
       <div className="flex items-center w-full gap-2 mb-[7%]">
-        <p className="font-normal text-vermelho">Igreja</p>
-        <div className="bg-vermelho w-full h-[1px]"></div>
+        <p className="font-normal text-vermelho dark:text-vermelho-dark">Igreja</p>
+        <div className="bg-vermelho dark:bg-vermelho-dark w-full h-[1px]"></div>
       </div>
 
       <div className="w-[95%] mb-[7%] flex flex-col">
@@ -310,14 +310,14 @@ export default function EditUsers() {
       <div className="flex justify-between w-[95%] mt-6">
         <button
           onClick={() => navigate("/usuarios")}
-          className="bg-vermelho text-branco px-10 py-2 rounded-full"
+          className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
         >
           Voltar
         </button>
 
         <button
           onClick={handleSave}
-          className="bg-vermelho text-branco px-10 py-2 rounded-full"
+          className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
         >
           Salvar
         </button>

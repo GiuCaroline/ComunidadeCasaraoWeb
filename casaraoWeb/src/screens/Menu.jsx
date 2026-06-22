@@ -13,7 +13,7 @@ export default function Menu() {
                 <span className="text-preto dark:text-branco text-xl">
                     Gerenciar Usuários
                 </span>
-                <UsersIcon size={30} className="text-vermelho" />
+                <UsersIcon size={30} className="text-vermelho dark:text-vermelho-dark dark:text-vermelho dark:text-vermelho-dark-dark" />
             </div>
             
             <div
@@ -22,7 +22,7 @@ export default function Menu() {
                 <span className="text-preto dark:text-branco text-xl">
                     Gerenciar Eventos
                 </span>
-                <CalendarBlankIcon size={30} className="text-vermelho" />
+                <CalendarBlankIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </div>
             
             <div
@@ -31,7 +31,7 @@ export default function Menu() {
                 <span className="text-preto dark:text-branco text-xl">
                     Gerenciar Galeria de Eventos
                 </span>
-                <ImagesSquareIcon size={30} className="text-vermelho" />
+                <ImagesSquareIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </div>
             
             <div
@@ -40,7 +40,7 @@ export default function Menu() {
                 <span className="text-preto dark:text-branco text-xl">
                     Gerenciar Escalas
                 </span>
-                <CalendarPlusIcon size={30} className="text-vermelho" />
+                <CalendarPlusIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </div>
             
             <div
@@ -49,7 +49,7 @@ export default function Menu() {
                 <span className="text-preto dark:text-branco text-xl">
                     Gerenciar Cursos
                 </span>
-                <GraduationCapIcon size={30} className="text-vermelho" />
+                <GraduationCapIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </div>
         </div>
         

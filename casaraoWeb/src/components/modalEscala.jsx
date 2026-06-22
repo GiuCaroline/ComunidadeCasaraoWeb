@@ -163,7 +163,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
             />
           </div>
 
-          <div className="relative w-full flex flex-col justify-center items-center border border-1 border-vermelho rounded-xl px-2 py-6 mb-[2%] mt-[2%]">
+          <div className="relative w-full flex flex-col justify-center items-center border border-1 border-vermelho dark:border-vermelho-dark rounded-xl px-2 py-6 mb-[2%] mt-[2%]">
             <div className="absolute -top-3 left-4 bg-branco dark:bg-preto-dark px-2">
               <span className="text-sm font-popRegular text-preto dark:text-branco">
                 1º Escala
@@ -217,7 +217,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
               mostrarSegundaEscala ? "max-h-[500px] opacity-100 mt-[2%]" : "max-h-0 opacity-0 mt-0"
             }`}
           >
-            <div className="relative w-full flex flex-col justify-center items-center border border-1 border-vermelho rounded-xl px-2 py-6 mb-[2%] mt-[4%]">
+            <div className="relative w-full flex flex-col justify-center items-center border border-1 border- dark:border-vermelho-dark rounded-xl px-2 py-6 mb-[2%] mt-[4%]">
               <div className="absolute -top-3 left-4 bg-branco dark:bg-preto-dark px-2">
                 <span className="text-sm font-popRegular text-preto dark:text-branco">
                   2º Escala
@@ -228,7 +228,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
                 onClick={handleRemoveSegundaEscala}
                 className="absolute -top-4 right-4 bg-branco dark:bg-preto-dark rounded-full"
               >
-                <MinusCircle size={32} className="text-vermelho" weight="fill" />
+                <MinusCircle size={32} className="text-vermelho dark:text-vermelho-dark" weight="fill" />
               </button>
 
               <Input
@@ -267,14 +267,14 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
         <div className="flex justify-between w-[95%] mt-6 mx-auto">
           <button
             onClick={onClose}
-            className="bg-vermelho text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
           >
             Voltar
           </button>
 
           <button
             onClick={handleSubmit}
-            className="bg-vermelho text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
           >
             Salvar
           </button>

@@ -295,7 +295,7 @@ export default function Eventos() {
 
           <div className="flex gap-3">
             <button onClick={() => handleDeleteClick(evento.id, evento)}>
-              <TrashIcon size={30} className="text-vermelho" />
+              <TrashIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </button>
 
             <button onClick={() => handleEdit(evento)}>
@@ -310,7 +310,7 @@ export default function Eventos() {
           setEditingEvento(null);
           setModalVisible(true);
         }}
-        className="absolute bottom-20 right-5 bg-vermelho shadow-md rounded-full p-4"
+        className="absolute bottom-20 right-5 bg-vermelho dark:text-vermelho-dark shadow-md rounded-full p-4"
         id="editar"
       >
         <PlusIcon className="text-branco" size={30} />

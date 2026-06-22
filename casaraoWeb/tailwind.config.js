@@ -23,7 +23,8 @@ export default {
         'placeInput': '#5e5e5e',
         'vermelho': {
           DEFAULT: '#BB1C00',
-          opaci: '#bb1c0073'
+          opaci: '#bb1c0073',
+          dark: '#ee2400',
         },
         'masc': {
           DEFAULT: '#BCCFFF',
