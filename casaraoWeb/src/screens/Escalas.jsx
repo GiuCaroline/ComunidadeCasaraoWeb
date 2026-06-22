@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { PlusIcon, PencilSimple } from "@phosphor-icons/react";
-import { useNavigate } from "react-router-dom";
 import MonthHeaderWeb from "../components/monthHeaderWeb";
 import CustomCalendarWeb from "../components/customCalendarWeb";
+import { ModalEscala } from "../components/modalEscala";
 
 export default function Escalas() {
   const [escalas, setEscalas] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingEscala, setEditingEscala] = useState(null);
+
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fakeEscalas = [
@@ -38,7 +39,25 @@ export default function Escalas() {
   }, [selectedDate, escalas]);
 
   function handleEdit(escala) {
-    navigate("/editar", { state: { escala } });
+    setEditingEscala(escala);
+    setModalVisible(true);
+  }
+
+  function handleSaveEscala(data) {
+    if (editingEscala) {
+      const updated = escalas.map((esc) =>
+        esc.id === editingEscala.id ? { ...editingEscala, ...data } : esc
+      );
+      setEscalas(updated);
+    } else {
+      const newEscala = {
+        id: Date.now(),
+        ...data,
+      };
+      setEscalas([...escalas, newEscala]);
+    }
+
+    setModalVisible(false);
   }
 
   function getMarkedDays(escalas) {
@@ -80,7 +99,13 @@ export default function Escalas() {
             className="w-[95%] bg-input dark:bg-input-dark rounded-2xl shadow-md px-4 py-2 flex justify-between items-center"
           >
             <div className="flex flex-col">
-              <p style={{ color: escala.cor }}>{escala.gap}<label className="text-preto dark:text-branco"> - {getDiaDaSemanaCurto(escala.data)}</label></p>
+              <p style={{ color: escala.cor }}>
+                {escala.gap}
+                <label className="text-preto dark:text-branco">
+                  {" "}
+                  - {getDiaDaSemanaCurto(escala.data)}
+                </label>
+              </p>
               <p className="text-sm font-light text-preto dark:text-branco">
                 10h - {escala.escala1}
               </p>
@@ -102,9 +127,22 @@ export default function Escalas() {
           </div>
         ))}
 
-      <button className="fixed bottom-6 right-6 bg-vermelho shadow-md rounded-full p-4">
+      <button
+        onClick={() => {
+          setEditingEscala(null);
+          setModalVisible(true);
+        }}
+        className="fixed bottom-6 right-6 bg-vermelho shadow-md rounded-full p-4"
+      >
         <PlusIcon className="text-branco" size={30} />
       </button>
+
+      <ModalEscala
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSave={handleSaveEscala}
+        escala={editingEscala}
+      />
     </div>
   );
 }

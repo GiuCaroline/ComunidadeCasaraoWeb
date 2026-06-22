@@ -96,7 +96,7 @@ export function ModalEvento({ visible, onClose, onSave, evento }) {
             />
 
             <div className="w-[95%] mb-[7%] flex flex-col mt-[-6%]">
-                <label className="text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5] mb-1">
+                <label className="text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5]  ml-[4.5%]">
                     Data do Evento
                 </label>
         
@@ -110,9 +110,6 @@ export function ModalEvento({ visible, onClose, onSave, evento }) {
             </div>
 
             <div className="mt-[-5%] ml-[3%]">
-                <label className="ml-[3%] text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5]">
-                    Horário
-                </label>
 
                 <div className="w-full flex items-end justify-start gap-2 mb-[7%] mt-[3%]">
                     <div className="w-[25%]">
