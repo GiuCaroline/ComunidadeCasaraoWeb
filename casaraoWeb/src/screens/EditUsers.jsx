@@ -173,7 +173,7 @@ export default function EditUsers() {
           </div>
 
           <div className="w-1/2 flex flex-col mt-[-12%]">
-            <label className="text-sm text-[#5e5e5e] mb-1">
+            <label className="text-sm text-[#5e5e5e] dark:text-[#a5a5a5] mb-1">
               Cor da Escala
             </label>
             <input
@@ -188,7 +188,7 @@ export default function EditUsers() {
       )}
 
       <div className="w-[95%] mb-[7%] flex flex-col">
-        <label className="text-[14px] text-[#5e5e5e] mb-1">
+        <label className="text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5] mb-1">
           Data de Nascimento
         </label>
 
@@ -203,7 +203,7 @@ export default function EditUsers() {
           dropdownMode="select"
           scrollableYearDropdown
           yearDropdownItemNumber={100}
-          className="h-[48px] w-full bg-input dark:bg-input-dark rounded-xl px-[15px] outline-none shadow-md"
+          className="h-[48px] w-full bg-input dark:bg-input-dark text-preto dark:text-branco rounded-xl px-[15px] outline-none shadow-md"
         />
       </div>
       <MascFem value={sexo} onChange={setSexo} />
@@ -268,7 +268,7 @@ export default function EditUsers() {
       </div>
 
       <div className="w-[95%] mb-[7%] flex flex-col">
-        <label className="text-[14px] text-[#5e5e5e] mb-1">
+        <label className="text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5] mb-1 ml-[4.5%]">
           Membro Desde
         </label>
 
@@ -279,13 +279,13 @@ export default function EditUsers() {
           onChange={(date) => setMembro(date)}
           dateFormat="MM/yyyy"
           showMonthYearPicker
-          className="h-[48px] w-full bg-input dark:bg-input-dark rounded-xl px-[15px] outline-none shadow-md"
+          className="h-[48px] w-full bg-input dark:bg-input-dark text-preto dark:text-branco rounded-xl px-[15px] outline-none shadow-md"
           placeholderText="Selecione mês e ano"
         />
       </div>
 
       <div className="w-[95%] mb-[7%] flex flex-col">
-        <label className="text-[14px] text-[#5e5e5e] mb-1">
+        <label className="text-[14px] text-[#5e5e5e] dark:text-[#a5a5a5] mb-1 ml-[4.5%]">
           Data do Batismo
         </label>
 
@@ -300,7 +300,7 @@ export default function EditUsers() {
           scrollableYearDropdown
           yearDropdownItemNumber={100}
           dateFormat="dd/MM/yyyy"
-          className="h-[48px] w-full bg-input dark:bg-input-dark rounded-xl px-[15px] outline-none shadow-md"
+          className="h-[48px] w-full bg-input dark:bg-input-dark text-preto dark:text-branco rounded-xl px-[15px] outline-none shadow-md"
           placeholderText="Selecione a data"
         />
       </div>

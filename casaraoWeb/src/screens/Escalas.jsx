@@ -17,11 +17,11 @@ export default function Escalas() {
 
   useEffect(() => {
     const fakeEscalas = [
-      { id: 1, gap: "Iluminação", cor: "#0077ff", data: "2026-03-08", escala1: "Giulia", escala2: "Wilson" },
-      { id: 2, gap: "Mídia", cor: "#FF0004", data: "2026-03-08", escala1: "Gabão", escala2: "" },
-      { id: 3, gap: "Som", cor: "#A148FF", data: "2026-03-08", escala1: "Edu", escala2: "Guilherme" },
-      { id: 4, gap: "Projeção", cor: "#48ff66", data: "2026-03-08", escala1: "Murilo", escala2: "Lincon" },
-      { id: 5, gap: "Diaconato", cor: "#ffe448", data: "2026-03-08", escala1: "Fábio", escala2: "Jovens" },
+      { id: 1, gap: "Iluminação", cor: "#0077ff", data: "2026-07-08", escala1: "Giulia", escala2: "Wilson" },
+      { id: 2, gap: "Mídia", cor: "#FF0004", data: "2026-07-08", escala1: "Gabão", escala2: "" },
+      { id: 3, gap: "Som", cor: "#A148FF", data: "2026-07-08", escala1: "Edu", escala2: "Guilherme" },
+      { id: 4, gap: "Projeção", cor: "#48ff66", data: "2026-07-08", escala1: "Murilo", escala2: "Lincon" },
+      { id: 5, gap: "Diaconato", cor: "#ffe448", data: "2026-06-08", escala1: "Fábio", escala2: "Jovens" },
     ];
 
     setEscalas(fakeEscalas);
@@ -80,7 +80,7 @@ export default function Escalas() {
             className="w-[95%] bg-input dark:bg-input-dark rounded-2xl shadow-md px-4 py-2 flex justify-between items-center"
           >
             <div className="flex flex-col">
-              <p style={{ color: escala.cor }}>{escala.gap}</p>
+              <p style={{ color: escala.cor }}>{escala.gap}<label className="text-preto dark:text-branco"> - {getDiaDaSemanaCurto(escala.data)}</label></p>
               <p className="text-sm font-light text-preto dark:text-branco">
                 10h - {escala.escala1}
               </p>
@@ -118,4 +118,14 @@ function formatDate(dateString) {
     day: "2-digit",
     month: "2-digit",
   });
+}
+
+function getDiaDaSemanaCurto(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(dateString + "T00:00:00");
+  const diaCompleto = date.toLocaleDateString("pt-BR", { weekday: "long" });
+  const diaCurto = diaCompleto.split("-")[0];
+
+  return diaCurto.charAt(0).toUpperCase() + diaCurto.slice(1);
 }

@@ -21,7 +21,7 @@ export function MascFem({ value = null, onChange }) {
 
   return (
     <div className="w-[95%] mb-[10%]">
-      <p className="text-[16px] text-placeInput mb-4">
+      <p className="text-[16px] text-placeInput dark:text-[#a5a5a5] mb-4">
         Sexo
       </p>
 
@@ -44,7 +44,7 @@ export function MascFem({ value = null, onChange }) {
               className={
                 selected === "M"
                   ? "text-[#2E9AFF]"
-                  : "text-[#5e5e5e]"
+                  : "text-[#5e5e5e] dark:text-[#bababa]"
               }
             />
           </div>
@@ -72,7 +72,7 @@ export function MascFem({ value = null, onChange }) {
               className={
                 selected === "F"
                   ? "text-[#C700A2]"
-                  : "text-[#5e5e5e]"
+                  : "text-[#5e5e5e] dark:text-[#bababa]"
               }
             />
           </div>

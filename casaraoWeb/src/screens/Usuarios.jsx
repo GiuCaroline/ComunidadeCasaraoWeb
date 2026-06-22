@@ -98,6 +98,8 @@ export default function Usuarios() {
             rounded-full
             bg-input
             dark:bg-input-dark
+            text-preto
+            dark:text-branco
             shadow-md
             outline-none
           "

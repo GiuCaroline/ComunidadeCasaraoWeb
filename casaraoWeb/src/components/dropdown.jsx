@@ -11,7 +11,8 @@ export function Dropdown({
   const [selectedLabel, setSelectedLabel] = useState("");
   const dropdownRef = useRef(null);
 
-  // Se vier valor inicial (edição)
+  const isActive = expanded || selectedLabel.length > 0;
+
   useEffect(() => {
     if (value) {
       const found = data.find((item) => item.value === value);
@@ -21,7 +22,6 @@ export function Dropdown({
     }
   }, [value, data]);
 
-  // Fechar ao clicar fora
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -45,14 +45,13 @@ export function Dropdown({
 
   return (
     <div
-      className="relative w-[95%] mb-[9%]"
+      className="relative w-[95%] h-[50px] mb-[9%]"
       ref={dropdownRef}
     >
-      {/* Botão */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="
-          h-[48px]
+          h-full
           w-full
           bg-input dark:bg-input-dark
           rounded-xl
@@ -62,19 +61,34 @@ export function Dropdown({
           shadow-md
         "
       >
-        <span className="text-placeInput dark:text-[#a5a5a5] text-[16px]">
-          {selectedLabel || placeholder}
+        <span className="text-[16px]">
+          {selectedLabel}
         </span>
 
-        {expanded ? <CaretUp size={22} className="text-placeInput dark:text-[#a5a5a5]"/> : <CaretDown size={22} className="text-placeInput dark:text-[#a5a5a5]"/>}
+        {expanded ? (
+          <CaretUp size={22} className="text-[#5e5e5e] dark:text-[#a5a5a5]" />
+        ) : (
+          <CaretDown size={22} className="text-[#5e5e5e] dark:text-[#a5a5a5]" />
+        )}
       </button>
 
-      {/* Lista */}
+      <label
+        className={`
+          absolute left-4 transition-all duration-200
+          ${isActive ? "-top-4 text-sm" : "top-3 text-base"}
+          text-[#5e5e5e]
+          dark:text-[#a5a5a5]
+          pointer-events-none
+        `}
+      >
+        {placeholder}
+      </label>
+
       {expanded && (
         <div
           className="
             absolute
-            top-[52px]
+            top-[55px]
             w-full
             bg-input dark:bg-input-dark
             max-h-[300px]
@@ -94,7 +108,7 @@ export function Dropdown({
                 h-[45px]
                 text-left
                 px-2
-                text-placeInput dark:text-[#a5a5a5]
+                text-[#5e5e5e] dark:text-[#a5a5a5]
                 text-[16px]
                 hover:bg-black/5
                 rounded-lg
