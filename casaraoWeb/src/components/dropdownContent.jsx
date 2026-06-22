@@ -8,20 +8,20 @@ export function DropdownContent() {
     <div className="w-[95%] max-w-md flex flex-col">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#f4f4f4] dark:bg-input-dark rounded-xl shadow-md px-5 py-4 flex justify-between items-center text-left transition-colors"
+        className="w-full bg-input dark:bg-input-dark rounded-xl shadow-md px-5 py-4 flex justify-between items-center text-left transition-colors"
       >
         <div className="flex flex-col">
           <span className="text-[16px] font-medium text-preto dark:text-branco">
             Curso de Casais
           </span>
-          <span className="text-[14px] font-light text-[#5e5e5e] dark:text-[#a5a5a5]">
+          <span className="text-[14px] font-light text-preto dark:text-branco">
             As terças e quintas - 20h
           </span>
         </div>
         {isOpen ? (
-          <CaretUp size={24} className="text-[#5e5e5e] dark:text-[#a5a5a5]" />
+          <CaretUp size={24} className="text-preto dark:text-branco" />
         ) : (
-          <CaretDown size={24} className="text-[#5e5e5e] dark:text-[#a5a5a5]" />
+          <CaretDown size={24} className="text-preto dark:text-branco" />
         )}
       </button>
 
@@ -36,7 +36,7 @@ export function DropdownContent() {
               <h3 className="text-[16px] font-medium text-preto dark:text-branco mb-2">
                 Descrição
               </h3>
-              <p className="text-[14px] font-light text-preto dark:text-[#a5a5a5] leading-relaxed">
+              <p className="text-[14px] font-light text-preto dark:text-branco leading-relaxed">
                 Este curso aborda temas importantes denro de um casamento. Sobre
                 ter filhos e mesmo assim continuar sendo um belo casal.
               </p>
@@ -61,7 +61,6 @@ export function DropdownContent() {
                     teste@gmail.com
                   </span>
                 </div>
-
               </div>
             </div>
           </div>
