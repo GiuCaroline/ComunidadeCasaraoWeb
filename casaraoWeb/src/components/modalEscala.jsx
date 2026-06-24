@@ -18,7 +18,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   const [hora, setHora] = useState("");
   const [minuto, setMinuto] = useState("");
 
-  const [hora2, setHora2] = useState(""); // Ajustei o nome do estado para hora2 para manter o padrão
+  const [hora2, setHora2] = useState("");
   const [minuto2, setMinuto2] = useState("");
 
   const [mostrarSegundaEscala, setMostrarSegundaEscala] = useState(false);
@@ -32,7 +32,6 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
     { value: "6", label: "Projeção" },
   ];
 
-  // Função para quebrar a string do banco ("10:30:00") e colocar nos inputs
   function preencherHorarios(horarioString, setH, setM) {
     if (!horarioString) {
       setH("");
@@ -57,10 +56,8 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
         data: parsedDate,
       });
 
-      // Preenche os inputs da primeira escala
       preencherHorarios(escala.horario1, setHora, setMinuto);
 
-      // Preenche os inputs da segunda escala, se houver
       if (escala.responsavel2) {
         setMostrarSegundaEscala(true);
         preencherHorarios(escala.horario2, setHora2, setMinuto2);
@@ -267,14 +264,14 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
         <div className="flex justify-between w-[95%] mt-6 mx-auto">
           <button
             onClick={onClose}
-            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho text-branco px-10 py-2 rounded-full"
           >
             Voltar
           </button>
 
           <button
             onClick={handleSubmit}
-            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho text-branco px-10 py-2 rounded-full"
           >
             Salvar
           </button>

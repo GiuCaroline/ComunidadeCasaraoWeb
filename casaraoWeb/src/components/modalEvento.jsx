@@ -146,14 +146,14 @@ export function ModalEvento({ visible, onClose, onSave, evento }) {
         <div className="flex justify-between w-[95%] mt-6">
             <button
             onClick={onClose}
-            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho text-branco px-10 py-2 rounded-full"
             >
                 Voltar
             </button>
 
             <button
             onClick={handleSubmit}
-            className="bg-vermelho dark:bg-vermelho-dark text-branco px-10 py-2 rounded-full"
+            className="bg-vermelho text-branco px-10 py-2 rounded-full"
             >
                 Salvar
             </button>

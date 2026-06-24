@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { CaretUp, CaretDown, WhatsappLogo, EnvelopeSimple } from "@phosphor-icons/react";
 
-export function DropdownContent() {
+
+
+export function DropdownContent({titulo, dias, horario, descricao, celular, email}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -12,10 +14,10 @@ export function DropdownContent() {
       >
         <div className="flex flex-col">
           <span className="text-[16px] font-medium text-preto dark:text-branco">
-            Curso de Casais
+            {titulo}
           </span>
           <span className="text-[14px] font-light text-preto dark:text-branco">
-            As terças e quintas - 20h
+            {dias} - {formataHora(horario)}
           </span>
         </div>
         {isOpen ? (
@@ -37,8 +39,7 @@ export function DropdownContent() {
                 Descrição
               </h3>
               <p className="text-[14px] font-light text-preto dark:text-branco leading-relaxed">
-                Este curso aborda temas importantes denro de um casamento. Sobre
-                ter filhos e mesmo assim continuar sendo um belo casal.
+                {descricao}
               </p>
             </div>
 
@@ -47,18 +48,17 @@ export function DropdownContent() {
                 Responsáveis
               </h3>
               <div className="flex flex-col gap-4">
-                
                 <div className="flex items-center gap-3">
                   <WhatsappLogo size={26} className="text-vermelho dark:text-vermelho-dark" />
                   <span className="text-[15px] font-normal text-preto dark:text-branco">
-                    (11) 940028922
+                    {celular}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <EnvelopeSimple size={26} className="text-vermelho dark:text-vermelho-dark" />
                   <span className="text-[15px] font-normal text-preto dark:text-branco">
-                    teste@gmail.com
+                    {email}
                   </span>
                 </div>
               </div>
@@ -68,4 +68,22 @@ export function DropdownContent() {
       </div>
     </div>
   );
+}
+
+function formataHora(tempo) {
+  if (!tempo) return "";
+
+  const partes = tempo.split(":");
+  if (partes.length >= 2) {
+    const hora = partes[0];
+    const minuto = partes[1];
+
+    if (minuto === "00") {
+      return `${hora}h`;
+    }
+    
+    return `${hora}h${minuto}`;
+  }
+
+  return tempo;
 }
