@@ -3,6 +3,7 @@ import { MagnifyingGlass, TrashIcon, PencilSimple } from "@phosphor-icons/react"
 import { ConfirmDelete } from "../components/confirmDelete";
 import { AlertCustom } from "../components/alert";
 import { useNavigate } from "react-router-dom";
+import { getUsers } from "../services/authService";
 
 
 export default function Usuarios() {
@@ -26,6 +27,18 @@ export default function Usuarios() {
     ];
 
     setUsers(fakeUsers);
+  }, []);
+
+  useEffect(() => {
+    async function carregarUsers() {
+      try {
+        const data = await getUsers();
+        setUsers(data.users);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    carregarUsers();
   }, []);
 
   useEffect(() => {
@@ -111,8 +124,7 @@ export default function Usuarios() {
         />
       </div>
 
-      {/* 📋 Lista */}
-      {filteredUsers.map((user) => (
+      {users.map((user) => (
         <div
           key={user.id}
           className="
