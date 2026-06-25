@@ -42,10 +42,9 @@ export function Nav() {
 
   return (
     <>
-      <nav className="w-full bg-transparent fixed top-0 left-0 z-50">
+      <nav className="w-full bg-branco dark:bg-preto-dark fixed top-0 left-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
 
-          {/* ===== MOBILE HEADER ===== */}
           <div className="flex items-center gap-3 md:hidden">
 
             {isHome ? (

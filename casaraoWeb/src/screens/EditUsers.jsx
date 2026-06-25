@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "../components/input";
 import { MascFem } from "../components/genero";
 import { Dropdown } from "../components/dropdown";
@@ -7,37 +7,46 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import { ptBR } from "date-fns/locale";
+import { getCargos } from "../services/authService";
 
 registerLocale("pt-BR", ptBR);
-
 
 export default function EditUsers() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [cargos, setCargos] = useState([]);
   const user = location.state?.user;
 
   if (!user) {
     navigate("/usuarios");
   }
 
-  const cargos = [
-    { value: "1", label: "Cooperador" },
-    { value: "2", label: "Discipulador" },
-    { value: "3", label: "Equipe de Intercessão" },
-    { value: "4", label: "Funcionário" },
-    { value: "5", label: "Líder de Departamento" },
-    { value: "6", label: "Líder de GR" },
-    { value: "7", label: "Líder de Ministério" },
-    { value: "8", label: "Membro" },
-    { value: "9", label: "Pastor" },
-    { value: "10", label: "STAFF ILUMINAÇÃO" },
-    { value: "11", label: "STAFF MÍDIA" },
-    { value: "12", label: "STAFF PROJEÇÃO" },
-    { value: "13", label: "STAFF SOM" },
-    { value: "14", label: "STAFF VÍDEO" },
-    { value: "15", label: "Visitante" },
-  ];
+  useEffect(() => {
+      async function carregarCargos() {
+        try {
+          const data = await getCargos();
+  
+          if (Array.isArray(data)) {
+            setCargos(data);
+          } else if (data && Array.isArray(data.cargos)) {
+            setCargos(data.cargos);
+          } else if (data && Array.isArray(data.data)) {
+            setCargos(data.data);
+          } else if (data && typeof data === 'object') {
+            const extrairArray = Object.values(data).find(Array.isArray);
+            setCargos(extrairArray || []);
+          } else {
+            setCargos([]);
+          }
+        } catch (error) {
+          console.log(error);
+          setCargos([]);
+        }
+      }
+      carregarCargos();
+    }, []);
+
 
   const estadoCivis = [
     { value: "1", label: "Casado(a)" },
@@ -80,26 +89,26 @@ export default function EditUsers() {
   ];
 
   const [nome, setNome] = useState(user?.nome || "");
-  const [cargo, setCargo] = useState("5");
-  const [estadoCivil, setEstadoCivil] = useState("6");
-  const [conjuge, setConjuge] = useState("");
-  const [grauInstr, setGrauInstr] = useState("12");
-  const [situacao, setSituacao] = useState("Ativo");
+  const [cargo, setCargo] = useState(user?.cargo ? String(user.cargo) : "");
+  const [estadoCivil, setEstadoCivil] = useState(user?.estadocivil ? String(user.estadocivil) : "");
+  const [conjuge, setConjuge] = useState(user?.conjuge || "");
+  const [grauInstr, setGrauInstr] = useState(user?.grauInstr ? String(user.grauInstr) : "");
+  const [situacao, setSituacao] = useState(user?.situacao ? String(user.situacao) : "");
   const [email, setEmail] = useState(user?.email || "");
   const [sexo, setSexo] = useState(user?.sexo || "M");
-  const [telefone, setTelefone] = useState("(11) 940205682");
-  const [mae, setMae] = useState("Siclana de tal");
-  const [pai, setPai] = useState("Siclano de tal");
-  const [endereco, setEndereco] = useState("Rua dos Bobos");
-  const [departamento, setDepartamento] = useState("");
-  const [corEscala, setCorEscala] = useState("#0077ff");
-  const [cep, setCep] = useState("09123-123");
-  const [uf, setUf] = useState("SP");
-  const [bairro, setBairro] = useState("Vila Velha");
-  const [complemento, setComplemento] = useState("Nenhum, essa sua cabeça oca!!!");
-  const [nascimento, setNascimento] = useState(new Date(2010, 9, 10));
-  const [membro, setMembro] = useState(new Date(2015, 7));
-  const [batismo, setBatismo] = useState(new Date(2019, 9, 19));
+  const [telefone, setTelefone] = useState(user?.celular || "");
+  const [mae, setMae] = useState(user?.mae || "");
+  const [pai, setPai] = useState(user?.pai || "");
+  const [endereco, setEndereco] = useState(user?.endereco || "");
+  const [departamento, setDepartamento] = useState(user?.departamento ? String(user.departamento) : "");
+  const [corEscala, setCorEscala] = useState("");
+  const [cep, setCep] = useState(user?.cep || "");
+  const [uf, setUf] = useState(user?.uf || "");
+  const [bairro, setBairro] = useState(user?.bairro || "");
+  const [complemento, setComplemento] = useState(user?.complemento || "");
+  const [nascimento, setNascimento] = useState(user?.dtanasc ? ajustarData(user.dtanasc) : new Date(2010, 9, 10));
+  const [membro, setMembro] = useState(user?.membrodesde ? ajustarData(user.membrodesde) : new Date(2015, 7));
+  const [batismo, setBatismo] = useState(user?.dtabatismo ? ajustarData(user.dtabatismo) : new Date(2019, 9, 19));
 
   function handleSave() {
     console.log("Usuário atualizado:", {
@@ -125,8 +134,6 @@ export default function EditUsers() {
 
     navigate("/usuarios");
   }
-
-
 
   async function buscarCep(cep) {
     const cleanCep = cep.replace(/\D/g, "");
@@ -326,8 +333,6 @@ export default function EditUsers() {
   );
 }
 
-
-
 function formatTelefone(value) {
   const numbers = value.replace(/\D/g, "");
 
@@ -342,11 +347,18 @@ function formatTelefone(value) {
     .replace(/(\d{5})(\d)/, "$1-$2");
 }
 
-
 function formatCep(value) {
   const numbers = value.replace(/\D/g, "");
 
   return numbers
     .replace(/^(\d{5})(\d)/, "$1-$2")
     .slice(0, 9);
+}
+
+function ajustarData(dataOriginal) {
+  if (!dataOriginal) return null;
+  if (dataOriginal instanceof Date) return dataOriginal;
+  
+  const partes = dataOriginal.split('T')[0].split('-');
+  return new Date(partes[0], partes[1] - 1, partes[2] || 1);
 }

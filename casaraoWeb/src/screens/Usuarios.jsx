@@ -5,7 +5,6 @@ import { AlertCustom } from "../components/alert";
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../services/authService";
 
-
 export default function Usuarios() {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState([]);
@@ -19,23 +18,25 @@ export default function Usuarios() {
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
-    const fakeUsers = [
-      { id: 1, nome: "Culto", email: "teste@teste.com" },
-      { id: 2, nome: "Jovens", email: "maria@email.com" },
-      { id: 3, nome: "Oração", email: "joao@email.com" },
-      
-    ];
-
-    setUsers(fakeUsers);
-  }, []);
-
-  useEffect(() => {
     async function carregarUsers() {
       try {
         const data = await getUsers();
-        setUsers(data.users);
+
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else if (data && Array.isArray(data.users)) {
+          setUsers(data.users);
+        } else if (data && Array.isArray(data.data)) {
+          setUsers(data.data);
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          setUsers(extrairArray || []);
+        } else {
+          setUsers([]);
+        }
       } catch (error) {
         console.log(error);
+        setUsers([]);
       }
     }
     carregarUsers();
@@ -47,11 +48,17 @@ export default function Usuarios() {
       return;
     }
 
-    const result = users.filter(
-      (user) =>
-        user.nome.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase())
-    );
+    const listaSegura = Array.isArray(users) ? users : [];
+
+    const result = listaSegura.filter((user) => {
+      const nomeUsuario = user?.nome || "";
+      const emailUsuario = user?.email || "";
+
+      return (
+        nomeUsuario.toLowerCase().includes(search.toLowerCase()) ||
+        emailUsuario.toLowerCase().includes(search.toLowerCase())
+      );
+    });
 
     setFilteredUsers(result);
   }, [search, users]);
@@ -96,9 +103,8 @@ export default function Usuarios() {
     navigate("/editar", { state: { user } });
   }
 
-
   return (
-    <div className="pt-5 px-4 flex flex-col items-center gap-6">
+    <div className="pt-5 px-4 pb-[20%] flex flex-col items-center gap-6">
 
       <div className="relative w-[95%]">
         <input
@@ -124,7 +130,7 @@ export default function Usuarios() {
         />
       </div>
 
-      {users.map((user) => (
+      {filteredUsers.map((user) => (
         <div
           key={user.id}
           className="
@@ -155,7 +161,6 @@ export default function Usuarios() {
         </div>
       ))}
 
-      {/* Modais */}
       <ConfirmDelete
         visible={confirmVisible}
         onConfirm={handleConfirmDelete}
