@@ -265,6 +265,12 @@ export default function EditUsers() {
     }
   }
 
+  useEffect(() => {
+    if (estadoCivil !== "1" && estadoCivil !== "7") {
+      setConjuge("");
+    }
+  }, [estadoCivil]);
+
   return (
     <div className="flex flex-col items-center pt-6 pb-10 px-5">
       <Input texto="Nome" value={nome} onChange={setNome} />
