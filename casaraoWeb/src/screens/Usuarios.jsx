@@ -3,7 +3,7 @@ import { MagnifyingGlass, TrashIcon, PencilSimple } from "@phosphor-icons/react"
 import { ConfirmDelete } from "../components/confirmDelete";
 import { AlertCustom } from "../components/alert";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../services/authService";
+import { getUsers, deleteUser } from "../services/authService";
 
 export default function Usuarios() {
   const [search, setSearch] = useState("");
@@ -68,10 +68,12 @@ export default function Usuarios() {
     setConfirmVisible(true);
   }
 
-  function handleConfirmDelete() {
+  async function handleConfirmDelete() {
     setConfirmVisible(false);
 
     try {
+      await deleteUser(selectedUserId);
+
       const updated = users.filter((user) => user.id !== selectedUserId);
       setUsers(updated);
 
@@ -79,9 +81,10 @@ export default function Usuarios() {
       setAlertTitle("Usuário removido");
       setAlertMessage("O usuário foi apagado com sucesso.");
     } catch (error) {
+      console.log(error);
       setAlertType("error");
       setAlertTitle("Erro");
-      setAlertMessage("Não foi possível apagar o usuário.");
+      setAlertMessage("Não foi possível apagar o usuário no servidor.");
     }
 
     setAlertVisible(true);

@@ -9,9 +9,54 @@ export async function getUsers(data) {
   }
 }
 
+export async function updateUser(id, data) {
+  try {
+    const response = await api.put(`/auth/updateUser/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
+export async function deleteUser(id) {
+  try {
+    const response = await api.delete(`/auth/user/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao deletar usuário" };
+  }
+}
+
 export async function getCargos(data) {
   try {
     const response = await api.get("/auth/cargos", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
+export async function getEstados(data) {
+  try {
+    const response = await api.get("/auth/estadocivil", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
+export async function getGraus(data) {
+  try {
+    const response = await api.get("/auth/grauInst", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
+export async function getDeparts(data) {
+  try {
+    const response = await api.get("/auth/departamento", data);
     return response.data;
   } catch (error) {
     throw error.response?.data || { error: "Erro no servidor" };

@@ -11,13 +11,13 @@ export function Dropdown({
   const [selectedLabel, setSelectedLabel] = useState("");
   const dropdownRef = useRef(null);
 
-  const isActive = expanded || selectedLabel.length > 0;
+  const isActive = expanded || (selectedLabel && selectedLabel.length > 0);
 
   useEffect(() => {
     if (value) {
       const found = data.find((item) => item.value === value);
       if (found) {
-        setSelectedLabel(found.label);
+        setSelectedLabel(found.label || "");
       }
     }
   }, [value, data]);
@@ -38,7 +38,7 @@ export function Dropdown({
   }, []);
 
   const onSelect = (item) => {
-    setSelectedLabel(item.label);
+    setSelectedLabel(item.label || "");
     onChange && onChange(item);
     setExpanded(false);
   };

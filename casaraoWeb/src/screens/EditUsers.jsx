@@ -7,7 +7,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import { ptBR } from "date-fns/locale";
-import { getCargos } from "../services/authService";
+import { PlusCircle, MinusCircle } from "@phosphor-icons/react";
+import { getCargos, getEstados, getGraus, getDeparts, updateUser } from "../services/authService";
 
 registerLocale("pt-BR", ptBR);
 
@@ -16,6 +17,9 @@ export default function EditUsers() {
   const navigate = useNavigate();
 
   const [cargos, setCargos] = useState([]);
+  const [estados, setEstados] = useState([]);
+  const [graus, setGraus] = useState([]);
+  const [departamentos, setDeparts] = useState([]);
   const user = location.state?.user;
 
   if (!user) {
@@ -23,56 +27,97 @@ export default function EditUsers() {
   }
 
   useEffect(() => {
-      async function carregarCargos() {
-        try {
-          const data = await getCargos();
-  
-          if (Array.isArray(data)) {
-            setCargos(data);
-          } else if (data && Array.isArray(data.cargos)) {
-            setCargos(data.cargos);
-          } else if (data && Array.isArray(data.data)) {
-            setCargos(data.data);
-          } else if (data && typeof data === 'object') {
-            const extrairArray = Object.values(data).find(Array.isArray);
-            setCargos(extrairArray || []);
-          } else {
-            setCargos([]);
-          }
-        } catch (error) {
-          console.log(error);
-          setCargos([]);
+    async function carregarCargos() {
+      try {
+        const data = await getCargos();
+        let arrayDeCargos = [];
+
+        if (Array.isArray(data)) {
+          arrayDeCargos = data;
+        } else if (data && Array.isArray(data.cargos)) {
+          arrayDeCargos = data.cargos;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeCargos = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeCargos = extrairArray || [];
         }
+
+        const cargosFormatados = arrayDeCargos.map((item) => ({
+          value: String(item.id),
+          label: item.cargo || "Sem Nome"
+        }));
+
+        setCargos(cargosFormatados);
+      } catch (error) {
+        console.log(error);
+        setCargos([]);
       }
-      carregarCargos();
-    }, []);
+    }
+    carregarCargos();
+  }, []);
 
+  useEffect(() => {
+    async function carregarEstados() {
+      try {
+        const data = await getEstados();
+        let arrayDeEstados = [];
 
-  const estadoCivis = [
-    { value: "1", label: "Casado(a)" },
-    { value: "2", label: "Desquitado(a)" },
-    { value: "3", label: "Divorciado(a)" },
-    { value: "4", label: "Não Informar" },
-    { value: "5", label: "Separado(a)" },
-    { value: "6", label: "Solteiro(a)" },
-    { value: "7", label: "União Estável" },
-    { value: "8", label: "Viúvo(a)" },
-  ];
+        if (Array.isArray(data)) {
+          arrayDeEstados = data;
+        } else if (data && Array.isArray(data.estados)) {
+          arrayDeEstados = data.estados;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeEstados = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeEstados = extrairArray || [];
+        }
 
-  const grauInstrs = [
-    { value: "1", label: "Alfabetizado" },
-    { value: "2", label: "Bacharelado" },
-    { value: "3", label: "Doutorado" },
-    { value: "4", label: "Especialização/Pós Graduação" },
-    { value: "5", label: "Fundamental (1°Grau) Completo" },
-    { value: "6", label: "Fundamental (1°Grau) Incompleto" },
-    { value: "7", label: "Médio (2°Grau) Completo" },
-    { value: "8", label: "Médio (2°Grau) Incompleto" },
-    { value: "9", label: "Mestrado" },
-    { value: "10", label: "Não Sabe Ler/Escrever" },
-    { value: "11", label: "Superior Completo" },
-    { value: "12", label: "Superior Incompleto" },
-  ];
+        const estadosFormatados = arrayDeEstados.map((item) => ({
+          value: String(item.id),
+          label: item.estado || "Sem Nome"
+        }));
+
+        setEstados(estadosFormatados);
+      } catch (error) {
+        console.log(error);
+        setEstados([]);
+      }
+    }
+    carregarEstados();
+  }, []);
+
+  useEffect(() => {
+    async function carregarGraus() {
+      try {
+        const data = await getGraus();
+        let arrayDeGraus = [];
+
+        if (Array.isArray(data)) {
+          arrayDeGraus = data;
+        } else if (data && Array.isArray(data.graus)) {
+          arrayDeGraus = data.graus;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeGraus = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeGraus = extrairArray || [];
+        }
+
+        const grausFormatados = arrayDeGraus.map((item) => ({
+          value: String(item.id),
+          label: item.instrucao || "Sem Nome"
+        }));
+
+        setGraus(grausFormatados);
+      } catch (error) {
+        console.log(error);
+        setGraus([]);
+      }
+    }
+    carregarGraus();
+  }, []);
 
   const situacaos = [
     { value: "Ativo", label: "Ativo" },
@@ -80,19 +125,48 @@ export default function EditUsers() {
     { value: "Inativo", label: "Inativo" },
   ];
 
-  const departamentos = [
-    { value: "1", label: "Louvor" },
-    { value: "2", label: "Mídia" },
-    { value: "3", label: "Iluminação" },
-    { value: "4", label: "Som" },
-    { value: "4", label: "Diaconato" },
-  ];
+  useEffect(() => {
+    async function carregarDeparts() {
+      try {
+        const data = await getDeparts();
+        let arrayDeDeparts = [];
+
+        if (Array.isArray(data)) {
+          arrayDeDeparts = data;
+        } else if (data && Array.isArray(data.departamentos)) {
+          arrayDeDeparts = data.departamentos;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeDeparts = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeDeparts = extrairArray || [];
+        }
+
+        const departamentosFormatados = arrayDeDeparts.map((item) => ({
+          value: String(item.id),
+          label: item.departamento || "Sem Nome"
+        }));
+
+        setDeparts(departamentosFormatados);
+      } catch (error) {
+        console.log(error);
+        setDeparts([]);
+      }
+    }
+    carregarDeparts();
+  }, []);
+
+  const cargosIniciais = [user?.cargo, user?.cargo2, user?.cargo3, user?.cargo4]
+    .map((c) => (c ? String(c) : ""))
+    .filter((c) => c !== "");
+
+  if (cargosIniciais.length === 0) cargosIniciais.push("");
 
   const [nome, setNome] = useState(user?.nome || "");
-  const [cargo, setCargo] = useState(user?.cargo ? String(user.cargo) : "");
+  const [cargosAtivos, setCargosAtivos] = useState(cargosIniciais);
   const [estadoCivil, setEstadoCivil] = useState(user?.estadocivil ? String(user.estadocivil) : "");
   const [conjuge, setConjuge] = useState(user?.conjuge || "");
-  const [grauInstr, setGrauInstr] = useState(user?.grauInstr ? String(user.grauInstr) : "");
+  const [grau, setGrau] = useState(user?.grauinst ? String(user.grauinst) : "");
   const [situacao, setSituacao] = useState(user?.situacao ? String(user.situacao) : "");
   const [email, setEmail] = useState(user?.email || "");
   const [sexo, setSexo] = useState(user?.sexo || "M");
@@ -101,7 +175,7 @@ export default function EditUsers() {
   const [pai, setPai] = useState(user?.pai || "");
   const [endereco, setEndereco] = useState(user?.endereco || "");
   const [departamento, setDepartamento] = useState(user?.departamento ? String(user.departamento) : "");
-  const [corEscala, setCorEscala] = useState("");
+  const [corEscala, setCorEscala] = "";
   const [cep, setCep] = useState(user?.cep || "");
   const [uf, setUf] = useState(user?.uf || "");
   const [bairro, setBairro] = useState(user?.bairro || "");
@@ -110,29 +184,63 @@ export default function EditUsers() {
   const [membro, setMembro] = useState(user?.membrodesde ? ajustarData(user.membrodesde) : new Date(2015, 7));
   const [batismo, setBatismo] = useState(user?.dtabatismo ? ajustarData(user.dtabatismo) : new Date(2019, 9, 19));
 
-  function handleSave() {
-    console.log("Usuário atualizado:", {
-      nome,
-      estadoCivil,
-      conjuge,
-      grauInstr,
-      situacao,
-      mae,
-      pai,
-      cep,
-      uf,
-      email,
-      telefone,
-      endereco,
-      bairro,
-      complemento,
-      cargo,
-      nascimento,
-      membro,
-      batismo,
-    });
+  function handleCargoChange(index, value) {
+    const novos = [...cargosAtivos];
+    novos[index] = value;
+    setCargosAtivos(novos);
+  }
 
-    navigate("/usuarios");
+  function addCargo() {
+    if (cargosAtivos.length < 4) {
+      setCargosAtivos([...cargosAtivos, ""]);
+    }
+  }
+
+  function removeCargo() {
+    if (cargosAtivos.length > 1) {
+      const novos = [...cargosAtivos];
+      novos.pop();
+      setCargosAtivos(novos);
+    }
+  }
+
+  async function handleSave() {
+    try {
+      const payload = {
+        nome: nome || null,
+        nascimento: nascimento ? formatarDataBackend(nascimento) : null,
+        sexo: sexo || null,
+        
+        estadoCivil: estadoCivil || null, 
+        conjuge: conjuge || null,
+        escolaridade: grau || null, 
+        situacao: situacao || null,
+        
+        mae: mae || null,
+        pai: pai || null,
+        telefone: telefone || null,
+        cep: cep || null,
+        uf: uf || null,
+        endereco: endereco || null,
+        bairro: bairro || null,
+        complemento: complemento || null,
+        
+        cargo: cargosAtivos[0] || null,
+        cargo2: cargosAtivos[1] || null,
+        cargo3: cargosAtivos[2] || null,
+        cargo4: cargosAtivos[3] || null,
+        
+        membro: membro ? formatarDataBackend(membro) : null,
+        batismo: batismo ? formatarDataBackend(batismo) : null,
+        email: email || null,
+      };
+
+      await updateUser(user.id, payload);
+      
+      navigate("/usuarios");
+    } catch (error) {
+      console.log("Erro ao atualizar o usuário:", error);
+    }
   }
 
   async function buscarCep(cep) {
@@ -159,17 +267,38 @@ export default function EditUsers() {
 
   return (
     <div className="flex flex-col items-center pt-6 pb-10 px-5">
-
       <Input texto="Nome" value={nome} onChange={setNome} />
-      <Dropdown
-        data={cargos}
-        value={cargo}
-        placeholder="Cargo"
-        onChange={(item) => setCargo(item.value)}
-      />
-      {cargo === "5" && (
-        <div className="flex items-center gap-4 w-[95%] mb-[7%]">
 
+      {cargosAtivos.map((cargoValue, index) => (
+        <div key={index} className="flex items-start w-full justify-between">
+          <div className="flex-1 w-full justify-center items-center flex">
+            <Dropdown
+              data={cargos}
+              value={cargoValue}
+              placeholder={index === 0 ? "Cargo" : `Cargo ${index + 1}`}
+              onChange={(item) => handleCargoChange(index, item.value)}
+            />
+          </div>
+
+          {index === cargosAtivos.length - 1 && (
+            <div className="flex items-center gap-2 h-[50px]">
+              {cargosAtivos.length > 1 && (
+                <button onClick={removeCargo} className="text-vermelho">
+                  <MinusCircle size={32} weight="fill" />
+                </button>
+              )}
+              {cargosAtivos.length < 4 && (
+                <button onClick={addCargo} className="text-vermelho-dark">
+                  <PlusCircle size={32} weight="fill" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {cargosAtivos.includes("5") && (
+        <div className="flex items-center gap-4 w-[95%] mb-[7%]">
           <div className="w-1/2">
             <Dropdown
               data={departamentos}
@@ -190,7 +319,6 @@ export default function EditUsers() {
               className="h-[48px] w-full rounded-xl cursor-pointer"
             />
           </div>
-
         </div>
       )}
 
@@ -215,7 +343,7 @@ export default function EditUsers() {
       </div>
       <MascFem value={sexo} onChange={setSexo} />
       <Dropdown
-        data={estadoCivis}
+        data={estados}
         value={estadoCivil}
         placeholder="Estado Civil"
         onChange={(item) => setEstadoCivil(item.value)}
@@ -228,10 +356,10 @@ export default function EditUsers() {
         />
       )}
       <Dropdown
-        data={grauInstrs}
-        value={grauInstr}
+        data={graus}
+        value={grau}
         placeholder="Grau de Instrução"
-        onChange={(item) => setGrauInstr(item.value)}
+        onChange={(item) => setGrau(item.value)}
       />
       <Dropdown
         data={situacaos}
@@ -267,7 +395,7 @@ export default function EditUsers() {
       
       <Input texto="Endereço" value={endereco} onChange={setEndereco} />
       <Input texto="Bairro" value={bairro} onChange={setBairro} />
-      <Input texto="Complemento" value={complemento} onChange={setComplemento} />
+      <Input texto="Número e Complemento" value={complemento} onChange={setComplemento} />
         
       <div className="flex items-center w-full gap-2 mb-[7%]">
         <p className="font-normal text-vermelho dark:text-vermelho-dark">Igreja</p>
@@ -361,4 +489,12 @@ function ajustarData(dataOriginal) {
   
   const partes = dataOriginal.split('T')[0].split('-');
   return new Date(partes[0], partes[1] - 1, partes[2] || 1);
+}
+
+function formatarDataBackend(date) {
+  if (!date) return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
