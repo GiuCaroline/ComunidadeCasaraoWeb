@@ -32,7 +32,7 @@ export default function MonthHeaderWeb({ month, year, setMonth, setYear }) {
         <CaretLeft size={20} className="text-preto dark:text-branco  flex items-center"/>
       </button>
 
-      <span className="bg-vermelho dark:bg-vermelho-dark flex text-base items-center text-branco px-4 py-1 rounded-full text-sm h-full">
+      <span className="bg-vermelho flex text-base items-center text-branco px-4 py-1 rounded-full text-sm h-full">
         {months[month]} {year}
       </span>
 

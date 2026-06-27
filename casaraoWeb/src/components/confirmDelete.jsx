@@ -18,7 +18,7 @@ export function ConfirmDelete({ visible, onConfirm, onCancel, mensage }) {
 
           <button
             onClick={onCancel}
-            className="flex-1 bg-vermelho dark:bg-vermelho-dark text-white font-light py-2 rounded-xl"
+            className="flex-1 bg-vermelho text-white font-light py-2 rounded-xl"
           >
             Não
           </button>

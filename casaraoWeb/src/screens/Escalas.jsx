@@ -150,7 +150,7 @@ export default function Escalas() {
           setEditingEscala(null);
           setModalVisible(true);
         }}
-        className="fixed bottom-6 right-6 bg-vermelho dark:bg-vermelho-dark shadow-md rounded-full p-4"
+        className="fixed bottom-6 right-6 bg-vermelho shadow-md rounded-full p-4"
       >
         <PlusIcon className="text-branco" size={30} />
       </button>

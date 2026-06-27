@@ -60,7 +60,7 @@ export default function CustomCalendarWeb({
             >
               {day}
               {isMarked && (
-                <span className="absolute bottom-1 w-6 h-[2px] bg-vermelho dark:bg-vermelho-dark rounded-full"></span>
+                <span className="absolute bottom-1 w-6 h-[2px] bg-vermelho rounded-full"></span>
               )}
             </button>
           );

@@ -25,7 +25,7 @@ export default function Home() {
         />
       </div>
 
-      <button className="bg-vermelho dark:bg-vermelho-dark text-branco font-light px-10 mt-[15%] py-2 text-xl rounded-full" 
+      <button className="bg-vermelho text-branco font-light px-10 mt-[15%] py-2 text-xl rounded-full" 
       onClick={() => navigate("/login")}>Login</button>
     </div>
   )

@@ -25,7 +25,7 @@ export function DeleteOptionsModal({
 
           <button
             onClick={onDeleteAll}
-            className="bg-vermelho dark:bg-vermelho-dark text-white py-2 rounded-xl"
+            className="bg-vermelho text-white py-2 rounded-xl"
           >
             Todos os eventos
           </button>
