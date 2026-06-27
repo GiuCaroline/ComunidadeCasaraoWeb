@@ -55,7 +55,7 @@ export default function Login() {
         <button
           type="submit"
           onClick={() => navigate("/menu")}
-          className="mt-6 bg-primary text-branco bg-vermelho dark:bg-vermelho-dark py-3 px-20 rounded-full hover:opacity-90 transition"
+          className="mt-6 bg-primary text-branco bg-vermelho py-3 px-20 rounded-full hover:opacity-90 transition"
         >
           Entrar
         </button>
