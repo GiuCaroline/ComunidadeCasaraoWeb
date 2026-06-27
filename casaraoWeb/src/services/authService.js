@@ -62,3 +62,12 @@ export async function getDeparts(data) {
     throw error.response?.data || { error: "Erro no servidor" };
   }
 }
+
+export async function getEventos() {
+  try {
+    const response = await api.get("/auth/eventos");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
