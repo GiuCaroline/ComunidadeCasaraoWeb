@@ -252,7 +252,11 @@ export default function Eventos() {
         setAlertTitle("Sucesso");
         setAlertMessage("Alteração salva com sucesso.");
       } else {
-        const dataFormatada = formData.dia.toISOString().split("T")[0];
+        const ano = formData.dia.getFullYear();
+        const mes = String(formData.dia.getMonth() + 1).padStart(2, "0");
+        const dia = String(formData.dia.getDate()).padStart(2, "0");
+        const dataFormatada = `${ano}-${mes}-${dia}`;
+
         await addEvento({
           nome: formData.nome,
           horario: formData.horario,
@@ -311,7 +315,7 @@ export default function Eventos() {
             </p>
             <div className="flex justify-between w-full">
               <p className="text-sm font-light text-preto dark:text-branco">
-                {evento.horario}
+                {formataHora(evento.horario)}
               </p>
               <p className="text-sm font-light text-preto dark:text-branco">
                 {formatDate(evento.date)}
@@ -387,4 +391,22 @@ function formatDate(dateString) {
     day: "2-digit",
     month: "2-digit",
   });
+}
+
+function formataHora(tempo) {
+  if (!tempo) return "";
+
+  const partes = tempo.split(":");
+  if (partes.length >= 2) {
+    const hora = partes[0];
+    const minuto = partes[1];
+
+    if (minuto === "00") {
+      return `${hora}h`;
+    }
+    
+    return `${hora}h${minuto}`;
+  }
+
+  return tempo;
 }
