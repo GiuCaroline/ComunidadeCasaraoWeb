@@ -71,3 +71,30 @@ export async function getEventos() {
     throw error.response?.data || { error: "Erro no servidor" };
   }
 }
+
+export async function editEvento(payload) {
+  try {
+    const response = await api.put("/auth/eventos/editar", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao editar evento no servidor" };
+  }
+}
+
+export async function deleteEvento(payload) {
+  try {
+    const response = await api.delete("/auth/eventos/deletar", { data: payload });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao deletar evento no servidor" };
+  }
+}
+
+export async function addEvento(payload) {
+  try {
+    const response = await api.post("/auth/eventos/adicionar", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao criar evento no servidor" };
+  }
+}

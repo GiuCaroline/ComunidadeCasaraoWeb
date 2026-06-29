@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { TrashIcon, PencilSimple, PlusIcon } from "@phosphor-icons/react";
-import { ConfirmDelete } from "../components/confirmDelete";
 import { AlertCustom } from "../components/alert";
-import { useNavigate } from "react-router-dom";
 import { ModalEvento } from "../components/modalEvento";
 import EventCalendarModal from "../components/eventCalendarModal";
-import { DeleteOptionsModal } from "../components/deleteOptionsModal";
+import { OpcoesRecorrenciaModal } from "../components/opcoesRecorrenciaModal";
 import MonthHeaderWeb from "../components/monthHeaderWeb";
 import CustomCalendarWeb from "../components/customCalendarWeb";
-import { getEventos } from "../services/authService";
+import { getEventos, editEvento, deleteEvento, addEvento } from "../services/authService";
 
 export default function Eventos() {
   const [eventosBase, setEventosBase] = useState([]);
@@ -21,23 +19,21 @@ export default function Eventos() {
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
 
-  const [calendarVisible, setCalendarVisible] = useState(false);
-  const [grupoSelecionado, setGrupoSelecionado] = useState(null);
-  const [calendarAction, setCalendarAction] = useState(null);
-  const [selectedDateToDelete, setSelectedDateToDelete] = useState(null);
-  const [deleteModeVisible, setDeleteModeVisible] = useState(false);
+  const [optionsVisible, setOptionsVisible] = useState(false);
+  const [currentAction, setCurrentAction] = useState(null); 
+  const [targetEvento, setTargetEvento] = useState(null);
 
-  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [selectedDatesList, setSelectedDatesList] = useState([]);
+
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
-  const [selectedEventoId, setSelectedEventoId] = useState(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvento, setEditingEvento] = useState(null);
-
-  const navigate = useNavigate();
+  const [editModeType, setEditModeType] = useState("todos");
 
   async function carregarDados() {
     try {
@@ -109,7 +105,7 @@ export default function Eventos() {
     resultado.push(...daAgenda.map(e => ({ ...e, agenda_id: e.agenda_id, id: e.evento_id, date: dateString })));
 
     deventos.forEach(evento => {
-      if (evento.recorrente && evento.ativo !== false) {
+      if ((evento.recorrente || evento.recorrencia_id) && evento.ativo !== false) {
         const isCancelado = dcancelados.some(c => Number(c.evento_id) === Number(evento.id) && safeToDateString(c.data) === dateString);
         if (isCancelado) return;
 
@@ -170,64 +166,113 @@ export default function Eventos() {
 
   const markedDays = getMarkedDays();
 
-  function handleDeleteClick(id, evento) {
+  function handleTriggerDelete(evento) {
     if (evento.isGroup) {
-      setGrupoSelecionado(evento);
-      setCalendarAction("delete");
-      setCalendarVisible(true);
+      setCurrentAction("delete");
+      setTargetEvento(evento);
+      setOptionsVisible(true);
     } else {
-      setSelectedEventoId(id);
-      setConfirmVisible(true);
+      setTargetEvento(evento);
+      executarExclusaoDirect(evento.id, [], "todos", evento.agenda_id);
     }
   }
 
-  function handleDeleteOne() {
-    setDeleteModeVisible(false);
-    setAlertType("success");
-    setAlertTitle("Dia removido");
-    setAlertMessage("Somente o dia selecionado foi removido.");
-    setAlertVisible(true);
-  }
-
-  function handleDeleteAll() {
-    setDeleteModeVisible(false);
-    setAlertType("success");
-    setAlertTitle("Eventos removidos");
-    setAlertMessage("Todos os eventos foram removidos.");
-    setAlertVisible(true);
-  }
-
-  function handleConfirmDelete() {
-    setConfirmVisible(false);
-    setAlertType("success");
-    setAlertTitle("Dia removido");
-    setAlertMessage("O dia selecionado foi removido.");
-    setAlertVisible(true);
-    setSelectedDateToDelete(null);
-  }
-
-  function handleCancelDelete() {
-    setConfirmVisible(false);
-    setAlertType("warning");
-    setAlertTitle("Operação cancelada");
-    setAlertMessage("O evento não foi removido.");
-    setAlertVisible(true);
-  }
-
-  function handleEdit(evento) {
+  function handleTriggerEdit(evento) {
     if (evento.isGroup) {
-      setGrupoSelecionado(evento);
-      setCalendarAction("edit");
-      setCalendarVisible(true);
+      setCurrentAction("edit");
+      setTargetEvento(evento);
+      setOptionsVisible(true);
     } else {
+      setEditModeType("todos");
+      setSelectedDatesList([]);
+      setTargetEvento(evento);
       setEditingEvento(evento);
       setModalVisible(true);
     }
   }
 
-  function handleSaveEvento(data) {
+  function handleSelectModo(modo) {
+    setOptionsVisible(false);
+    if (modo === "todos") {
+      if (currentAction === "delete") {
+        executarExclusaoDirect(targetEvento.id, [], "todos");
+      } else {
+        setEditModeType("todos");
+        setSelectedDatesList([]);
+        setEditingEvento(targetEvento);
+        setModalVisible(true);
+      }
+    } else if (modo === "alguns") {
+      setCalendarVisible(true);
+    }
+  }
+
+  function handleCalendarContinue(datasSelecionadas) {
+    setCalendarVisible(false);
+    if (currentAction === "delete") {
+      executarExclusaoDirect(targetEvento.id, datasSelecionadas, "alguns");
+    } else {
+      setEditModeType("alguns");
+      setSelectedDatesList(datasSelecionadas);
+      setEditingEvento(targetEvento);
+      setModalVisible(true);
+    }
+  }
+
+  async function executarExclusaoDirect(eventoId, datas, modo, agendaId) {
+    try {
+      await deleteEvento({ eventoId, modo, datas, agendaId });
+      setAlertType("success");
+      setAlertTitle("Sucesso");
+      setAlertMessage("Exclusão realizada com sucesso.");
+      setAlertVisible(true);
+      carregarDados();
+    } catch (err) {
+      setAlertType("error");
+      setAlertTitle("Erro");
+      setAlertMessage("Não foi possível excluir.");
+      setAlertVisible(true);
+    }
+  }
+
+ async function handleSaveEvento(formData) {
     setModalVisible(false);
-    carregarDados();
+    try {
+      if (targetEvento || formData.id) {
+        await editEvento({
+          eventoId: targetEvento ? targetEvento.id : formData.id,
+          modo: editModeType,
+          datas: selectedDatesList,
+          nome: formData.nome,
+          horario: formData.horario,
+          categoria: formData.categoria,
+          agendaId: targetEvento ? targetEvento.agenda_id : formData.agenda_id
+        });
+        setAlertType("success");
+        setAlertTitle("Sucesso");
+        setAlertMessage("Alteração salva com sucesso.");
+      } else {
+        const dataFormatada = formData.dia.toISOString().split("T")[0];
+        await addEvento({
+          nome: formData.nome,
+          horario: formData.horario,
+          categoria: formData.categoria,
+          recorrente: formData.recorrente,
+          tipo_recorrencia: formData.tipo_recorrencia,
+          dia: dataFormatada
+        });
+        setAlertType("success");
+        setAlertTitle("Sucesso");
+        setAlertMessage("Evento criado com sucesso.");
+      }
+      setAlertVisible(true);
+      carregarDados();
+    } catch (err) {
+      setAlertType("error");
+      setAlertTitle("Erro");
+      setAlertMessage("Não foi possível salvar as alterações.");
+      setAlertVisible(true);
+    }
   }
 
   function getDiaSemanaTexto(dateString) {
@@ -275,11 +320,11 @@ export default function Eventos() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => handleDeleteClick(evento.id, evento)}>
+            <button onClick={() => handleTriggerDelete(evento)}>
               <TrashIcon size={30} className="text-vermelho dark:text-vermelho-dark" />
             </button>
 
-            <button onClick={() => handleEdit(evento)}>
+            <button onClick={() => handleTriggerEdit(evento)}>
               <PencilSimple size={30} className="text-[#01CB34]" />
             </button>
           </div>
@@ -288,7 +333,10 @@ export default function Eventos() {
 
       <button
         onClick={() => {
+          setTargetEvento(null);
           setEditingEvento(null);
+          setEditModeType("todos");
+          setSelectedDatesList([]);
           setModalVisible(true);
         }}
         className="fixed bottom-6 right-6 bg-vermelho dark:text-vermelho-dark shadow-md rounded-full p-4"
@@ -297,11 +345,11 @@ export default function Eventos() {
         <PlusIcon className="text-branco" size={30} />
       </button>
 
-      <ConfirmDelete
-        visible={confirmVisible}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        mensage={"evento"}
+      <OpcoesRecorrenciaModal
+        visible={optionsVisible}
+        onClose={() => setOptionsVisible(false)}
+        onSelectModo={handleSelectModo}
+        acao={currentAction}
       />
 
       <ModalEvento
@@ -309,33 +357,14 @@ export default function Eventos() {
         onClose={() => setModalVisible(false)}
         onSave={handleSaveEvento}
         evento={editingEvento}
+        modo={editModeType}
       />
 
       <EventCalendarModal
         visible={calendarVisible}
-        eventoGrupo={grupoSelecionado}
+        eventoGrupo={targetEvento}
         onClose={() => setCalendarVisible(false)}
-        onSelectDay={(date) => {
-          setCalendarVisible(false);
-
-          if (calendarAction === "edit") {
-            setEditingEvento({ ...grupoSelecionado, date });
-            setModalVisible(true);
-          }
-
-          if (calendarAction === "delete") {
-            setSelectedEventoId(grupoSelecionado.id);
-            setSelectedDateToDelete(date);
-            setDeleteModeVisible(true);
-          }
-        }}
-      />
-
-      <DeleteOptionsModal
-        visible={deleteModeVisible}
-        onDeleteOne={handleDeleteOne}
-        onDeleteAll={handleDeleteAll}
-        onCancel={() => setDeleteModeVisible(false)}
+        onContinue={handleCalendarContinue}
       />
 
       <AlertCustom
