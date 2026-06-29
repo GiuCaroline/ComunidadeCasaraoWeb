@@ -3,7 +3,7 @@ import { PlusIcon, PencilSimple } from "@phosphor-icons/react";
 import MonthHeaderWeb from "../components/monthHeaderWeb";
 import CustomCalendarWeb from "../components/customCalendarWeb";
 import { ModalEscala } from "../components/modalEscala";
-import { getDeparts, getEscalas } from "../services/authService";
+import { getDeparts, getEscalas, addEscala, editEscala } from "../services/authService";
 
 export default function Escalas() {
   const [escalas, setEscalas] = useState([]);
@@ -92,21 +92,29 @@ export default function Escalas() {
     setModalVisible(true);
   }
 
-  function handleSaveEscala(data) {
-    if (editingEscala) {
-      const updated = escalas.map((esc) =>
-        esc.id === editingEscala.id ? { ...editingEscala, ...data } : esc
-      );
-      setEscalas(updated);
-    } else {
-      const newEscala = {
-        id: Date.now(),
-        ...data,
-      };
-      setEscalas([...escalas, newEscala]);
-    }
+  async function handleSaveEscala(data) {
+    try {
+      if (editingEscala) {
+        await editEscala(editingEscala.id, data);
+        
+        const updated = escalas.map((esc) =>
+          esc.id === editingEscala.id ? { ...editingEscala, ...data } : esc
+        );
+        setEscalas(updated);
+      } else {
+        const response = await addEscala(data);
+        
+        const newEscala = {
+          id: response.id || Date.now(),
+          ...data,
+        };
+        setEscalas([...escalas, newEscala]);
+      }
 
-    setModalVisible(false);
+      setModalVisible(false);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function getMarkedDays(escalas) {

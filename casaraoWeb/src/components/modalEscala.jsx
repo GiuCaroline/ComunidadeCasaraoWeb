@@ -8,8 +8,8 @@ import { getDeparts } from "../services/authService";
 
 export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   const [form, setForm] = useState({
-    gap: "",
-    data: null,
+    departamento_id: "",
+    dia: null,
     responsavel1: "",
     responsavel2: "",
     horario1: "",
@@ -26,35 +26,35 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   const [mostrarSegundaEscala, setMostrarSegundaEscala] = useState(false);
 
   useEffect(() => {
-      async function carregarDeparts() {
-        try {
-          const data = await getDeparts();
-          let arrayDeDeparts = [];
-  
-          if (Array.isArray(data)) {
-            arrayDeDeparts = data;
-          } else if (data && Array.isArray(data.departamentos)) {
-            arrayDeDeparts = data.departamentos;
-          } else if (data && Array.isArray(data.data)) {
-            arrayDeDeparts = data.data;
-          } else if (data && typeof data === 'object') {
-            const extrairArray = Object.values(data).find(Array.isArray);
-            arrayDeDeparts = extrairArray || [];
-          }
-  
-          const departamentosFormatados = arrayDeDeparts.map((item) => ({
-            value: String(item.id),
-            label: item.departamento || "Sem Nome"
-          }));
-  
-          setDeparts(departamentosFormatados);
-        } catch (error) {
-          console.log(error);
-          setDeparts([]);
+    async function carregarDeparts() {
+      try {
+        const data = await getDeparts();
+        let arrayDeDeparts = [];
+
+        if (Array.isArray(data)) {
+          arrayDeDeparts = data;
+        } else if (data && Array.isArray(data.departamentos)) {
+          arrayDeDeparts = data.departamentos;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeDeparts = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeDeparts = extrairArray || [];
         }
+
+        const departamentosFormatados = arrayDeDeparts.map((item) => ({
+          value: String(item.id),
+          label: item.departamento || "Sem Nome"
+        }));
+
+        setDeparts(departamentosFormatados);
+      } catch (error) {
+        console.log(error);
+        setDeparts([]);
       }
-      carregarDeparts();
-    }, []);
+    }
+    carregarDeparts();
+  }, []);
 
   function preencherHorarios(horarioString, setH, setM) {
     if (!horarioString) {
@@ -71,13 +71,18 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
 
   useEffect(() => {
     if (escala) {
-      const parsedDate = escala.data
-        ? new Date(escala.data + "T00:00:00")
-        : null;
+      const valorDia = escala.dia || escala.data;
+      let parsedDate = null;
+
+      if (valorDia) {
+        const apenasData = valorDia.split("T")[0];
+        parsedDate = new Date(apenasData + "T00:00:00");
+      }
 
       setForm({
         ...escala,
-        data: parsedDate,
+        departamento_id: String(escala.departamento_id || escala.departamento || ""),
+        dia: parsedDate,
       });
 
       preencherHorarios(escala.horario1, setHora, setMinuto);
@@ -92,8 +97,8 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
       }
     } else {
       setForm({
-        gap: "",
-        data: null,
+        departamento: "",
+        dia: null,
         responsavel1: "",
         responsavel2: "",
         horario1: "",
@@ -128,28 +133,28 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   }
 
   function formatarParaBanco(h, m) {
-    if (!h) return "";
+    if (!h) return null;
     const horaFormatada = h.padStart(2, "0");
     const minutoFormatado = m ? m.padStart(2, "0") : "00";
     return `${horaFormatada}:${minutoFormatado}:00`;
   }
 
   function handleSubmit() {
-    let dataString = "";
+    let dataString = null;
 
-    if (form.data) {
-      const ano = form.data.getFullYear();
-      const mes = String(form.data.getMonth() + 1).padStart(2, "0");
-      const dia = String(form.data.getDate()).padStart(2, "0");
-      dataString = `${ano}-${mes}-${dia}`;
+    if (form.dia) {
+      const ano = form.dia.getFullYear();
+      const mes = String(form.dia.getMonth() + 1).padStart(2, "0");
+      const diaString = String(form.dia.getDate()).padStart(2, "0");
+      dataString = `${ano}-${mes}-${diaString}`;
     }
 
     const horarioFinal1 = formatarParaBanco(hora, minuto);
-    const horarioFinal2 = mostrarSegundaEscala ? formatarParaBanco(hora2, minuto2) : "";
+    const horarioFinal2 = mostrarSegundaEscala ? formatarParaBanco(hora2, minuto2) : null;
 
     onSave({
       ...form,
-      data: dataString,
+      dia: dataString,
       horario1: horarioFinal1,
       horario2: horarioFinal2,
     });
@@ -165,9 +170,9 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
         <div className="flex flex-col gap-3 items-center justify-center">
           <Dropdown
             data={departamentos}
-            value={form.gap}
+            value={form.departamento_id}
             placeholder="Departamento"
-            onChange={(item) => handleChange("departamento", item.value)}
+            onChange={(item) => handleChange("departamento_id", item.value)}
           />
 
           <div className="w-[95%] mb-[7%] flex flex-col mt-[-6%]">
@@ -176,8 +181,8 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
             </label>
 
             <DatePicker
-              selected={form.data}
-              onChange={(date) => handleChange("data", date)}
+              selected={form.dia}
+              onChange={(date) => handleChange("dia", date)}
               dateFormat="dd/MM/yyyy"
               locale="pt-BR"
               className="h-[48px] text-preto dark:text-branco w-full shadow-md bg-input dark:bg-input-dark rounded-xl px-[15px] outline-none"

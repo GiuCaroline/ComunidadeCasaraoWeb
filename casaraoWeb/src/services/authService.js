@@ -107,3 +107,21 @@ export async function getEscalas(data) {
     throw error.response?.data || { error: "Erro no servidor" };
   }
 }
+
+export async function addEscala(payload) {
+  try {
+    const response = await api.post("/auth/escalas/adicionar", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao criar escala no servidor" };
+  }
+}
+
+export async function editEscala(id, payload) {
+  try {
+    const response = await api.put(`/auth/escalas/editar/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao editar escala no servidor" };
+  }
+}
