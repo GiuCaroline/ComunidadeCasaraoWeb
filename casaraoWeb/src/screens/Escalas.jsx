@@ -3,20 +3,13 @@ import { PlusIcon, PencilSimple } from "@phosphor-icons/react";
 import MonthHeaderWeb from "../components/monthHeaderWeb";
 import CustomCalendarWeb from "../components/customCalendarWeb";
 import { ModalEscala } from "../components/modalEscala";
-
-const gapsAuxiliares = [
-  { id: "1", label: "Louvor", cor: "#0077ff" },
-  { id: "2", label: "Mídia", cor: "#FF0004" },
-  { id: "3", label: "Iluminação", cor: "#0077ff" },
-  { id: "4", label: "Som", cor: "#A148FF" },
-  { id: "5", label: "Diaconato", cor: "#ffe448" },
-  { id: "6", label: "Projeção", cor: "#48ff66" },
-];
+import { getDeparts, getEscalas } from "../services/authService";
 
 export default function Escalas() {
   const [escalas, setEscalas] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [departamentos, setDeparts] = useState([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEscala, setEditingEscala] = useState(null);
@@ -26,23 +19,70 @@ export default function Escalas() {
   const [year, setYear] = useState(today.getFullYear());
 
   useEffect(() => {
-    const fakeEscalas = [
-      { id: 1, gap: "3", data: "2026-07-08", responsavel1: "Giulia", responsavel2: "Wilson", horario1: '10:30:00', horario2: '18:00:00' },
-      { id: 2, gap: "2", data: "2026-07-08", responsavel1: "Gabão", responsavel2: "", horario1: '10:00:00', horario2: '18:00:00' },
-      { id: 3, gap: "4", data: "2026-07-08", responsavel1: "Edu", responsavel2: "Guilherme", horario1: '10:00:00', horario2: '18:00:00' },
-      { id: 4, gap: "6", data: "2026-07-08", responsavel1: "Murilo", responsavel2: "Lincon", horario1: '10:00:00', horario2: '18:00:00' },
-      { id: 5, gap: "5", data: "2026-06-08", responsavel1: "Fábio", responsavel2: "Jovens", horario1: '10:00:00', horario2: '18:00:00' },
-    ];
+    async function carregarDeparts() {
+      try {
+        const data = await getDeparts();
+        let arrayDeDeparts = [];
 
-    setEscalas(fakeEscalas);
+        if (Array.isArray(data)) {
+          arrayDeDeparts = data;
+        } else if (data && Array.isArray(data.departamentos)) {
+          arrayDeDeparts = data.departamentos;
+        } else if (data && Array.isArray(data.data)) {
+          arrayDeDeparts = data.data;
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          arrayDeDeparts = extrairArray || [];
+        }
+
+        const departamentosFormatados = arrayDeDeparts.map((item) => ({
+          id: String(item.id),
+          value: String(item.id),
+          label: item.departamento || "Sem Nome",
+          cor: item.cor || "#000000"
+        }));
+
+        setDeparts(departamentosFormatados);
+      } catch (error) {
+        console.log(error);
+        setDeparts([]);
+      }
+    }
+    carregarDeparts();
+  }, []);
+
+  useEffect(() => {
+    async function carregarEscalas() {
+      try {
+        const data = await getEscalas();
+
+        if (Array.isArray(data)) {
+          setEscalas(data);
+        } else if (data && Array.isArray(data.escalas)) {
+          setEscalas(data.escalas);
+        } else if (data && Array.isArray(data.data)) {
+          setEscalas(data.data);
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          setEscalas(extrairArray || []);
+        } else {
+          setEscalas([]);
+        }
+      } catch (error) {
+        console.log(error);
+        setEscalas([]);
+      }
+    }
+    carregarEscalas();
   }, []);
 
   useEffect(() => {
     if (!selectedDate) return;
 
-    const filtered = escalas.filter(
-      (escala) => escala.data === selectedDate
-    );
+    const filtered = escalas.filter((escala) => {
+      const dataEscala = escala.dia ? escala.dia.split("T")[0] : escala.data;
+      return dataEscala === selectedDate;
+    });
 
     setFilteredUsers(filtered);
   }, [selectedDate, escalas]);
@@ -73,17 +113,22 @@ export default function Escalas() {
     const result = {};
 
     escalas.forEach((escala) => {
-      if (escala.data) {
-        result[escala.data] = true;
+      const dataKey = escala.dia ? escala.dia.split("T")[0] : escala.data;
+      
+      if (dataKey) {
+        const cor = escala.cor || "#000000";
+        
+        if (!result[dataKey]) {
+          result[dataKey] = [];
+        }
+        
+        if (!result[dataKey].includes(cor)) {
+          result[dataKey].push(cor);
+        }
       }
     });
 
     return result;
-  }
-
-  function getGapInfo(gapId) {
-    const gapEncontrado = gapsAuxiliares.find((g) => g.id === String(gapId));
-    return gapEncontrado ? gapEncontrado : { label: "Desconhecido", cor: "#000000" };
   }
 
   const markedDays = getMarkedDays(escalas);
@@ -108,7 +153,9 @@ export default function Escalas() {
 
       {selectedDate &&
         filteredUsers.map((escala) => {
-          const info = getGapInfo(escala.gap);
+          const dataKey = escala.dia ? escala.dia.split("T")[0] : escala.data;
+          const corExibicao = escala.cor || "#000000";
+          const nomeDep = escala.nome_departamento || "Desconhecido";
 
           return (
             <div
@@ -116,11 +163,11 @@ export default function Escalas() {
               className="w-[95%] bg-input dark:bg-input-dark rounded-2xl shadow-md px-4 py-2 flex justify-between items-center"
             >
               <div className="flex flex-col">
-                <p style={{ color: info.cor }}>
-                  {info.label}
+                <p style={{ color: corExibicao }}>
+                  {nomeDep}
                   <label className="text-preto dark:text-branco">
                     {" "}
-                    - {getDiaDaSemanaCurto(escala.data)}
+                    - {getDiaDaSemanaCurto(dataKey)}
                   </label>
                 </p>
                 <p className="text-sm font-light text-preto dark:text-branco">
@@ -134,7 +181,7 @@ export default function Escalas() {
               </div>
               <div className="flex flex-col">
                 <p className="text-sm font-light text-preto dark:text-branco">
-                  {formatDate(escala.data)}
+                  {formatDate(dataKey)}
                 </p>
               </div>
 

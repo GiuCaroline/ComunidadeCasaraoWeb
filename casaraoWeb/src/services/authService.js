@@ -98,3 +98,12 @@ export async function addEvento(payload) {
     throw error.response?.data || { error: "Erro ao criar evento no servidor" };
   }
 }
+
+export async function getEscalas(data) {
+  try {
+    const response = await api.get("/auth/escalas", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}

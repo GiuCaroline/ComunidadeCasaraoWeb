@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Dropdown } from "../components/dropdown";
 import { PlusCircle, MinusCircle } from "@phosphor-icons/react";
+import { getDeparts } from "../services/authService";
 
 export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   const [form, setForm] = useState({
@@ -20,17 +21,40 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
 
   const [hora2, setHora2] = useState("");
   const [minuto2, setMinuto2] = useState("");
+  const [departamentos, setDeparts] = useState([]);
 
   const [mostrarSegundaEscala, setMostrarSegundaEscala] = useState(false);
 
-  const departamentos = [
-    { value: "1", label: "Louvor" },
-    { value: "2", label: "Mídia" },
-    { value: "3", label: "Iluminação" },
-    { value: "4", label: "Som" },
-    { value: "5", label: "Diaconato" },
-    { value: "6", label: "Projeção" },
-  ];
+  useEffect(() => {
+      async function carregarDeparts() {
+        try {
+          const data = await getDeparts();
+          let arrayDeDeparts = [];
+  
+          if (Array.isArray(data)) {
+            arrayDeDeparts = data;
+          } else if (data && Array.isArray(data.departamentos)) {
+            arrayDeDeparts = data.departamentos;
+          } else if (data && Array.isArray(data.data)) {
+            arrayDeDeparts = data.data;
+          } else if (data && typeof data === 'object') {
+            const extrairArray = Object.values(data).find(Array.isArray);
+            arrayDeDeparts = extrairArray || [];
+          }
+  
+          const departamentosFormatados = arrayDeDeparts.map((item) => ({
+            value: String(item.id),
+            label: item.departamento || "Sem Nome"
+          }));
+  
+          setDeparts(departamentosFormatados);
+        } catch (error) {
+          console.log(error);
+          setDeparts([]);
+        }
+      }
+      carregarDeparts();
+    }, []);
 
   function preencherHorarios(horarioString, setH, setM) {
     if (!horarioString) {
@@ -142,8 +166,8 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
           <Dropdown
             data={departamentos}
             value={form.gap}
-            placeholder="Gap"
-            onChange={(item) => handleChange("gap", item.value)}
+            placeholder="Departamento"
+            onChange={(item) => handleChange("departamento", item.value)}
           />
 
           <div className="w-[95%] mb-[7%] flex flex-col mt-[-6%]">
@@ -214,7 +238,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
               mostrarSegundaEscala ? "max-h-[500px] opacity-100 mt-[2%]" : "max-h-0 opacity-0 mt-0"
             }`}
           >
-            <div className="relative w-full flex flex-col justify-center items-center border border-1 border- dark:border-vermelho-dark rounded-xl px-2 py-6 mb-[2%] mt-[4%]">
+            <div className="relative w-full flex flex-col justify-center items-center border border-1 border-vermelho dark:border-vermelho-dark rounded-xl px-2 py-6 mb-[2%] mt-[4%]">
               <div className="absolute -top-3 left-4 bg-branco dark:bg-preto-dark px-2">
                 <span className="text-sm font-popRegular text-preto dark:text-branco">
                   2º Escala

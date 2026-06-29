@@ -59,8 +59,24 @@ export default function CustomCalendarWeb({
               `}
             >
               {day}
+              
               {isMarked && (
-                <span className="absolute bottom-1 w-6 h-[2px] bg-vermelho rounded-full"></span>
+                <div className="absolute bottom-1 flex gap-[2px] w-6 h-[2px]">
+                  {Array.isArray(isMarked) ? (
+                    isMarked.map((color, idx) => (
+                      <span 
+                        key={idx}
+                        className="h-full flex-1 rounded-full"
+                        style={{ backgroundColor: color }}
+                      ></span>
+                    ))
+                  ) : (
+                    <span 
+                      className={`h-full w-full rounded-full ${typeof isMarked === 'string' ? '' : 'bg-vermelho'}`}
+                      style={typeof isMarked === 'string' ? { backgroundColor: isMarked } : {}}
+                    ></span>
+                  )}
+                </div>
               )}
             </button>
           );
