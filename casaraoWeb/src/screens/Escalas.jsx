@@ -94,11 +94,23 @@ export default function Escalas() {
 
   async function handleSaveEscala(data) {
     try {
+      const depEncontrado = departamentos.find(
+        (d) => String(d.id) === String(data.departamento_id)
+      );
+      
+      const nomeDep = depEncontrado ? depEncontrado.label : "Desconhecido";
+      const corDep = depEncontrado ? depEncontrado.cor : "#000000";
+
       if (editingEscala) {
         await editEscala(editingEscala.id, data);
         
         const updated = escalas.map((esc) =>
-          esc.id === editingEscala.id ? { ...editingEscala, ...data } : esc
+          esc.id === editingEscala.id ? { 
+            ...editingEscala, 
+            ...data,
+            nome_departamento: nomeDep,
+            cor: corDep
+          } : esc
         );
         setEscalas(updated);
       } else {
@@ -107,11 +119,11 @@ export default function Escalas() {
         const newEscala = {
           id: response.id || Date.now(),
           ...data,
+          nome_departamento: nomeDep,
+          cor: corDep
         };
         setEscalas([...escalas, newEscala]);
       }
-
-      setModalVisible(false);
     } catch (error) {
       console.log(error);
     }

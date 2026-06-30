@@ -24,6 +24,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
   const [departamentos, setDeparts] = useState([]);
 
   const [mostrarSegundaEscala, setMostrarSegundaEscala] = useState(false);
+  const [perguntarMais, setPerguntarMais] = useState(false);
 
   useEffect(() => {
     async function carregarDeparts() {
@@ -69,6 +70,22 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
     }
   }
 
+  function limparFormulario() {
+    setForm({
+      departamento_id: "",
+      dia: null,
+      responsavel1: "",
+      responsavel2: "",
+      horario1: "",
+      horario2: "",
+    });
+    setHora("");
+    setMinuto("");
+    setHora2("");
+    setMinuto2("");
+    setMostrarSegundaEscala(false);
+  }
+
   useEffect(() => {
     if (escala) {
       const valorDia = escala.dia || escala.data;
@@ -96,19 +113,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
         setMinuto2("");
       }
     } else {
-      setForm({
-        departamento: "",
-        dia: null,
-        responsavel1: "",
-        responsavel2: "",
-        horario1: "",
-        horario2: "",
-      });
-      setHora("");
-      setMinuto("");
-      setHora2("");
-      setMinuto2("");
-      setMostrarSegundaEscala(false);
+      limparFormulario();
     }
   }, [escala]);
 
@@ -139,7 +144,7 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
     return `${horaFormatada}:${minutoFormatado}:00`;
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     let dataString = null;
 
     if (form.dia) {
@@ -152,17 +157,63 @@ export function ModalEscala({ visible, onClose, onSave, escala, titulo }) {
     const horarioFinal1 = formatarParaBanco(hora, minuto);
     const horarioFinal2 = mostrarSegundaEscala ? formatarParaBanco(hora2, minuto2) : null;
 
-    onSave({
+    await onSave({
       ...form,
       dia: dataString,
       horario1: horarioFinal1,
       horario2: horarioFinal2,
     });
+
+    if (escala) {
+      onClose();
+    } else {
+      setPerguntarMais(true);
+    }
+  }
+
+  function handleContinuar() {
+    setPerguntarMais(false);
+    limparFormulario();
+  }
+
+  function handleFinalizar() {
+    setPerguntarMais(false);
+    onClose();
+  }
+
+  if (perguntarMais) {
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="bg-branco dark:bg-preto-dark w-[90%] max-w-sm rounded-2xl p-8 shadow-lg flex flex-col items-center gap-6">
+          <h2 className="text-xl font-medium text-preto dark:text-branco text-center">
+            Salvo com sucesso!
+          </h2>
+          <p className="text-[#5e5e5e] dark:text-[#a5a5a5] text-center text-base">
+            Deseja adicionar mais uma escala?
+          </p>
+          <div className="flex w-full justify-between mt-2 gap-4">
+            <button
+              onClick={handleFinalizar}
+              className="bg-vermelho text-branco px-6 py-2 rounded-full w-1/2"
+            >
+              Não
+            </button>
+            <button
+              onClick={handleContinuar}
+              className="bg-[#2e9448] text-branco px-6 py-2 rounded-full w-1/2"
+            >
+              Sim
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-branco dark:bg-preto-dark w-[90%] max-w-md rounded-2xl p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+        
         <h2 className="text-lg font-normal mb-6 text-preto dark:text-branco">
           {titulo}
         </h2>
