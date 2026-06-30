@@ -4,7 +4,7 @@ import { Dropdown } from "../components/dropdown";
 
 export function ModalCurso({ visible, onClose, onSave, curso }) {
   const [form, setForm] = useState({
-    nomeCurso: "",
+    nome_curso: "",
     dias: "",
     horario: "",
     descricao: "",
@@ -32,7 +32,7 @@ export function ModalCurso({ visible, onClose, onSave, curso }) {
         }
     } else {
         setForm({
-            nomeCurso: "",
+            nome_curso: "",
             dias: "",
             horario: "",
             descricao: "",
@@ -84,15 +84,15 @@ export function ModalCurso({ visible, onClose, onSave, curso }) {
         <div className="flex flex-col gap-3 items-center justify-center">
             <Input
                 texto="Nome do Curso"
-                value={form.nomeCurso}
-                onChange={(value) => handleChange("nomeCurso", value)}
+                value={form.nome_curso}
+                onChange={(value) => handleChange("nome_curso", value)}
             />
 
             <Dropdown
                 data={Dias}
                 placeholder="Dia da Semana"
                 value={form.dias}
-                onChange={(value) => handleChange("dias", value)}
+                onChange={(item) => handleChange("dias", item.value)}
             />
 
             <div className="mt-[-5%] ml-[3%]">

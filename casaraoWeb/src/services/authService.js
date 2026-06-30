@@ -125,3 +125,39 @@ export async function editEscala(id, payload) {
     throw error.response?.data || { error: "Erro ao editar escala no servidor" };
   }
 }
+
+export async function getCursos(data) {
+  try {
+    const response = await api.get("/auth/cursos", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
+export async function deleteCursos(id) {
+  try {
+    const response = await api.delete(`/auth/cursos/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao deletar curso" };
+  }
+}
+
+export async function addCursos(payload) {
+  try {
+    const response = await api.post("/auth/cursos/adicionar", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao adicionar curso no servidor" };
+  }
+}
+
+export async function editCursos(id, payload) {
+  try {
+    const response = await api.put(`/auth/cursos/editar/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao editar curso no servidor" };
+  }
+}

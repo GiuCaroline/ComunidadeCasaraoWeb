@@ -1,25 +1,65 @@
 import { DropdownContent } from "../components/dropdownContent";
 import { ModalCurso } from "../components/ModalCurso";
+import { ConfirmDelete } from "../components/confirmDelete";
 import { MagnifyingGlass, TrashIcon, PencilSimple, PlusIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import { getCursos, addCursos, editCursos, deleteCursos } from "../services/authService";
 
 export default function Cursos() {
   const [cursos, setCursos] = useState([]);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [cursoSelecionado, setCursoSelecionado] = useState(null);
   const [termoPesquisa, setTermoPesquisa] = useState("");
+  
+  const [deleteModalVisivel, setDeleteModalVisivel] = useState(false);
+  const [cursoParaDeletar, setCursoParaDeletar] = useState(null);
 
   useEffect(() => {
-    const fakeCursos = [
-      { id: 1, nomeCurso: "Curso de Casais", dias: "Às terças e quintas", horario: "20:00:00", descricao: "Este curso aborda temas importantes dentro de um casamento. Sobre ter filhos e mesmo assim continuar sendo um belo casal.", celular: '(11) 94002-8922', email: 'teste@gmail.com' },
-      { id: 2, nomeCurso: "Curso Maturidade", dias: "Às quintas", horario: "20:30:00", descricao: "Uma descrição de um curso de maturidade, eu gostaria de testar como que ele fica com bastante caracteres porém não consigo medir com a descrição de baixo, deixa eu ver pera ai pelo que vi já está bem maior", celular: '(11) 94002-8922', email: 'responsavel@gmail.com' },
-    ];
+    async function carregarCursos() {
+      try {
+        const data = await getCursos();
 
-    setCursos(fakeCursos);
+        if (Array.isArray(data)) {
+          setCursos(data);
+        } else if (data && Array.isArray(data.cursos)) {
+          setCursos(data.cursos);
+        } else if (data && Array.isArray(data.data)) {
+          setCursos(data.data);
+        } else if (data && typeof data === 'object') {
+          const extrairArray = Object.values(data).find(Array.isArray);
+          setCursos(extrairArray || []);
+        } else {
+          setCursos([]);
+        }
+      } catch (error) {
+        console.log(error);
+        setCursos([]);
+      }
+    }
+    carregarCursos();
   }, []);
 
-  const handleDeleteClick = (id, curso) => {
-    console.log("Deletar curso:", id);
+  const handleDeleteClick = (id) => {
+    setCursoParaDeletar(id);
+    setDeleteModalVisivel(true);
+  };
+
+  const confirmarDelete = async () => {
+    if (!cursoParaDeletar) return;
+
+    try {
+      await deleteCursos(cursoParaDeletar);
+      setCursos((prev) => prev.filter((curso) => curso.id !== cursoParaDeletar));
+      setDeleteModalVisivel(false);
+      setCursoParaDeletar(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const cancelarDelete = () => {
+    setDeleteModalVisivel(false);
+    setCursoParaDeletar(null);
   };
 
   const handleEdit = (curso) => {
@@ -37,16 +77,28 @@ export default function Cursos() {
     setCursoSelecionado(null);
   };
 
-  const handleSaveCurso = (dados) => {
-    console.log("Dados do curso a salvar:", dados);
-    setModalVisivel(false);
+  const handleSaveCurso = async (dados) => {
+    try {
+      if (cursoSelecionado) {
+        const response = await editCursos(cursoSelecionado.id, dados);
+        setCursos((prev) =>
+          prev.map((c) => (c.id === cursoSelecionado.id ? { ...c, ...response } : c))
+        );
+      } else {
+        const response = await addCursos(dados);
+        setCursos((prev) => [...prev, response]);
+      }
+      handleCloseModal();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cursosFiltrados = cursos.filter((curso) => {
     const termo = termoPesquisa.toLowerCase();
     
     return (
-      curso.nomeCurso?.toLowerCase().includes(termo) ||
+      curso.nome_curso?.toLowerCase().includes(termo) ||
       curso.dias?.toLowerCase().includes(termo) ||
       curso.horario?.toLowerCase().includes(termo) ||
       curso.descricao?.toLowerCase().includes(termo) ||
@@ -55,8 +107,8 @@ export default function Cursos() {
     );
   });
 
-  return(
-    <div className="pt-5 px-4 flex flex-col items-center gap-6">
+  return (
+    <div className="pt-5 px-4 flex flex-col items-center gap-6 pb-24">
       <div className="relative w-[95%]">
         <input
           type="text"
@@ -78,7 +130,7 @@ export default function Cursos() {
           className="flex flex-row justify-between gap-3 items-center w-full max-w-md"
         >
           <DropdownContent
-            titulo={curso.nomeCurso}
+            titulo={curso.nome_curso}
             dias={curso.dias}
             horario={curso.horario}
             descricao={curso.descricao}
@@ -86,7 +138,7 @@ export default function Cursos() {
             email={curso.email}
           />
           <div className="flex flex-col gap-3">
-            <button onClick={() => handleDeleteClick(curso.id, curso)}>
+            <button onClick={() => handleDeleteClick(curso.id)}>
               <TrashIcon size={27} className="text-vermelho dark:text-vermelho-dark" />
             </button>
 
@@ -99,7 +151,7 @@ export default function Cursos() {
 
       <button
         onClick={handleOpenNew}
-        className="absolute bottom-20 right-5 bg-vermelho dark:text-vermelho-dark shadow-md rounded-full p-4"
+        className="fixed bottom-20 right-5 bg-vermelho dark:text-vermelho-dark shadow-md rounded-full p-4"
       >
         <PlusIcon className="text-branco" size={30} />
       </button>
@@ -110,6 +162,13 @@ export default function Cursos() {
         onSave={handleSaveCurso}
         curso={cursoSelecionado}
       />
+
+      <ConfirmDelete
+        visible={deleteModalVisivel}
+        onConfirm={confirmarDelete}
+        onCancel={cancelarDelete}
+        mensage="curso"
+      />
     </div>
-  )
+  );
 }
