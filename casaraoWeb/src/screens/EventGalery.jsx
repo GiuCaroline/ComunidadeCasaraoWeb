@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { CaretUp, CaretDown, X, Plus, DotsThreeOutlineVerticalIcon, TrashIcon, ImagesSquareIcon, CheckCircle } from "@phosphor-icons/react";
 import { ModalGaleria } from "../components/modalGaleria";
 import { DeleteOptionsModal } from "../components/deleteOptionsModal";
-import { getGaleriaEvento, addMidia, deleteMidia } from "../services/authService";
+import { getGaleriaEvento, addMidia, deleteMidia, updateDestaqueCarrossel } from "../services/authService";
 
 export default function EventGalery() {
   const location = useLocation();
