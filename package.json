@@ -1,0 +1,22 @@
+{
+  "name": "comunidadecasaraoweb",
+  "version": "1.0.0",
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "index.js","scripts": {
+    "dev": "concurrently \"npm start --prefix backend\" \"npm run dev --prefix casaraoWeb\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GiuCaroline/ComunidadeCasaraoWeb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GiuCaroline/ComunidadeCasaraoWeb/issues"
+  },
+  "homepage": "https://github.com/GiuCaroline/ComunidadeCasaraoWeb#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
