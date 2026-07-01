@@ -23,6 +23,27 @@ export default function EventGalery() {
   const [modoExclusao, setModoExclusao] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState([]);
 
+  const [modoCarrossel, setModoCarrossel] = useState(false);
+  const [selecoesCarrossel, setSelecoesCarrossel] = useState([]);
+  const toggleSelecaoCarrossel = (id) => {
+    const index = selecoesCarrossel.findIndex(item => item.id === id);
+    
+    if (index !== -1) {
+      const novaLista = selecoesCarrossel
+        .filter(item => item.id !== id)
+        .map((item, i) => ({ ...item, ordem: i + 1 }));
+      setSelecoesCarrossel(novaLista);
+    } else if (selecoesCarrossel.length < 3) {
+      setSelecoesCarrossel([...selecoesCarrossel, { id, ordem: selecoesCarrossel.length + 1 }]);
+    }
+  };
+
+  const salvarConfiguracaoCarrossel = async () => {
+    console.log("Salvando carrossel:", selecoesCarrossel);
+    alert("Carrossel atualizado!");
+    setModoCarrossel(false);
+  };
+
   async function fetchMidias() {
     if (evento?.agendaevento_id) {
       try {
@@ -196,16 +217,22 @@ export default function EventGalery() {
                   <div key={foto.id} className="relative">
                     <img
                       src={foto.url_arquivo}
-                      alt="Foto do evento"
-                      onClick={() => modoExclusao ? toggleSelecao(foto.id) : setSelectedImage(foto.url_arquivo)}
+                      alt="Foto"
+                      onClick={() => {
+                        if (modoExclusao) toggleSelecao(foto.id);
+                        else if (modoCarrossel) toggleSelecaoCarrossel(foto.id);
+                        else setSelectedImage(foto.url_arquivo);
+                      }}
                       className={`w-full h-20 object-cover rounded-xl cursor-pointer transition-all ${
-                        modoExclusao && itensSelecionados.includes(foto.id) 
+                        (modoExclusao && itensSelecionados.includes(foto.id)) || (modoCarrossel && selecoesCarrossel.find(s => s.id === foto.id))
                           ? "border-4 border-vermelho dark:border-vermelho-dark opacity-60" 
                           : ""
                       }`}
                     />
-                    {modoExclusao && itensSelecionados.includes(foto.id) && (
-                      <CheckCircle weight="fill" size={24} className="absolute top-1 right-1 text-vermelho dark:text-vermelho-dark bg-branco rounded-full" />
+                    {modoCarrossel && selecoesCarrossel.find(s => s.id === foto.id) && (
+                      <div className="absolute top-1 right-1 bg-vermelho text-branco rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs">
+                        {selecoesCarrossel.find(s => s.id === foto.id).ordem}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -297,27 +324,31 @@ export default function EventGalery() {
       )}
 
       <div className="fixed bottom-20 right-5 flex flex-col items-end gap-3 z-40">
-        {modoExclusao ? (
-          <>
-            <button
-              onClick={cancelarModoExclusao}
-              className="bg-gray-500 shadow-lg rounded-full p-4 hover:opacity-90 transition-opacity flex items-center justify-center"
-            >
-              <X className="text-branco" size={30} />
-            </button>
+        {modoCarrossel ? (
+           <button onClick={salvarConfiguracaoCarrossel} className="bg-vermelho text-branco rounded-full p-4 shadow-xl">
+             Salvar
+           </button>
+        ) : ( modoExclusao ? (
+              <>
+                <button
+                  onClick={cancelarModoExclusao}
+                  className="bg-gray-500 shadow-lg rounded-full p-4 hover:opacity-90 transition-opacity flex items-center justify-center"
+                >
+                  <X className="text-branco" size={30} />
+                </button>
 
-            <button
-              onClick={handleExcluirSelecionados}
-              disabled={isUploading || itensSelecionados.length === 0}
-              className={`shadow-lg rounded-full p-4 transition-opacity flex items-center justify-center ${
-                isUploading || itensSelecionados.length === 0
-                  ? "bg-gray-400 cursor-not-allowed" 
-                  : "bg-vermelho dark:bg-vermelho-dark hover:opacity-90"
-              }`}
-            >
-              <TrashIcon className="text-branco" size={30} />
-            </button>
-          </>
+                <button
+                  onClick={handleExcluirSelecionados}
+                  disabled={isUploading || itensSelecionados.length === 0}
+                  className={`shadow-lg rounded-full p-4 transition-opacity flex items-center justify-center ${
+                    isUploading || itensSelecionados.length === 0
+                      ? "bg-gray-400 cursor-not-allowed" 
+                      : "bg-vermelho dark:bg-vermelho-dark hover:opacity-90"
+                  }`}
+                >
+                  <TrashIcon className="text-branco" size={30} />
+                </button>
+              </>
         ) : (
           <>
             <div
@@ -340,7 +371,7 @@ export default function EventGalery() {
               </button>
 
               <button
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => setModoCarrossel(true)}
                 className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
               >
                 <span className="pl-3 text-sm font-medium text-branco">Carrossel</span>
@@ -369,7 +400,7 @@ export default function EventGalery() {
               <DotsThreeOutlineVerticalIcon className="text-branco" size={30} weight="fill" />
             </button>
           </>
-        )}
+        ))}
       </div>
 
       <ModalGaleria
