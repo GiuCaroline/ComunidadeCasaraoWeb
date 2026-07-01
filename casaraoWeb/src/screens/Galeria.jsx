@@ -1,25 +1,29 @@
 import { MagnifyingGlass, CalendarCheckIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getGaleriaEventos } from "../services/authService";
 
-export default function Galeria(){
+export default function Galeria() {
     const navigate = useNavigate();
     const [eventos, setEventos] = useState([]);
 
     useEffect(() => {
-        const fakeEventos = [
-            {id: 1, titulo: 'Jovens', date: '2026-07-04'},
-            {id: 2, titulo: 'Culto', date: '2026-07-05'},
-        ]
-
-        setEventos(fakeEventos);
+        async function fetchEventos() {
+            try {
+                const data = await getGaleriaEventos();
+                setEventos(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchEventos();
     }, []);
 
     function handleOpen(evento) {
         navigate("/eventgalery", { state: { evento } });
     }
 
-    return(
+    return (
         <div className="pt-5 px-4 flex flex-col items-center gap-6 pb-24">
             <div className="relative w-[95%]">
                 <input
@@ -39,14 +43,14 @@ export default function Galeria(){
                 {eventos.map((evento) => (
                     <button
                         className="bg-input dark:bg-input-dark px-4 py-3 shadow-md rounded-xl w-full flex flex-row items-center justify-between mb-[5%]"
-                        key={evento.id}
+                        key={evento.agendaevento_id}
                         onClick={() => handleOpen(evento)}
                     >
                         <div className="flex flex-row items-center gap-3">
                             <CalendarCheckIcon className="text-vermelho dark:text-vermelho-dark" size={32} />
                             <div className="flex flex-col items-start">
-                                <span className="font-regular text-preto dark:text-branco">{evento.titulo}</span>
-                                <span className="font-light text-preto dark:text-branco">Dia {formatDate(evento.date)}</span>
+                                <span className="font-regular text-preto dark:text-branco">{evento.nome} - {formataHora(evento.horario)}</span>
+                                <span className="font-light text-preto dark:text-branco">Dia {formatDate(evento.data)}</span>
                             </div>
                         </div>
                         <CaretRightIcon className="text-vermelho dark:text-vermelho-dark" size={32} />
@@ -60,11 +64,27 @@ export default function Galeria(){
 function formatDate(dateString) {
   if (!dateString) return "";
 
-  const date = new Date(dateString + "T00:00:00");
+  const date = new Date(dateString);
 
   return date.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
   });
+}
+
+function formataHora(tempo) {
+  if (!tempo) return "";
+
+  const partes = tempo.split(":");
+  if (partes.length >= 2) {
+    const hora = partes[0];
+    const minuto = partes[1];
+
+    if (minuto === "00") {
+      return `${hora}h`;
+    }
+    
+    return `${hora}h${minuto}`;
+  }
 }

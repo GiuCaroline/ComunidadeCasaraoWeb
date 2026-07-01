@@ -161,3 +161,57 @@ export async function editCursos(id, payload) {
     throw error.response?.data || { error: "Erro ao editar curso no servidor" };
   }
 }
+
+export async function getGaleriaEventos() {
+  try {
+    const response = await api.get("/auth/galeria/eventos");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao buscar eventos da galeria" };
+  }
+}
+
+export async function getGaleriaEvento(agendaevento_id) {
+  try {
+    const response = await api.get(`/auth/galeria/evento/${agendaevento_id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao buscar mídias do evento" };
+  }
+}
+
+export async function getCarrossel() {
+  try {
+    const response = await api.get("/auth/galeria/carrossel");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao buscar fotos do carrossel" };
+  }
+}
+
+export async function addMidia(payload) {
+  try {
+    const response = await api.post("/auth/galeria/adicionar", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao adicionar mídia" };
+  }
+}
+
+export async function updateDestaqueCarrossel(id, payload) {
+  try {
+    const response = await api.put(`/auth/galeria/destaque/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao atualizar destaque" };
+  }
+}
+
+export async function deleteMidia(id) {
+  try {
+    const response = await api.delete(`/auth/galeria/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Erro ao deletar mídia" };
+  }
+}
