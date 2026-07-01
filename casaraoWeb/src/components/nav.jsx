@@ -76,13 +76,13 @@ export function Nav() {
 
           {/* ===== DESKTOP MENU ===== */}
           <div className="hidden md:flex gap-8 items-center">
-            <Link to="/menu">Home</Link>
-            <Link to="/usuarios">Usuários</Link>
-            <Link to="/eventos">Eventos</Link>
-            <Link to="/galeria">Galeria</Link>
-            <Link to="/escalas">Escalas</Link>
-            <Link to="/cursos">Cursos</Link>
-            <Link to="/perfil">Perfil</Link>
+            <Link to="/menu" className="text-preto dark:text-branco">Home</Link>
+            <Link to="/usuarios" className="text-preto dark:text-branco">Usuários</Link>
+            <Link to="/eventos" className="text-preto dark:text-branco">Eventos</Link>
+            <Link to="/galeria" className="text-preto dark:text-branco">Galeria</Link>
+            <Link to="/escalas" className="text-preto dark:text-branco">Escalas</Link>
+            <Link to="/cursos" className="text-preto dark:text-branco">Cursos</Link>
+            <Link to="/perfil" className="text-preto dark:text-branco">Perfil</Link>
 
             <button
               onClick={() => setDarkMode(!darkMode)}

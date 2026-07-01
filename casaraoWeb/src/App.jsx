@@ -7,6 +7,7 @@ import Usuarios from "./screens/Usuarios";
 import EditUsers from "./screens/EditUsers";
 import Eventos from "./screens/Eventos";
 import Galeria from "./screens/Galeria";
+import EventGalery from "./screens/EventGalery";
 import Escalas from "./screens/Escalas";
 import Cursos from "./screens/Cursos";
 
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/editar" element={<EditUsers />} />
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/galeria" element={<Galeria />} />
+          <Route path="/eventgalery" element={<EventGalery />} />
           <Route path="/escalas" element={<Escalas />} />
           <Route path="/cursos" element={<Cursos />} />
         </Routes>

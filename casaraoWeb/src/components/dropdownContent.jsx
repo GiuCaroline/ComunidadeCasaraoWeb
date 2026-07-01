@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { CaretUp, CaretDown, WhatsappLogo, EnvelopeSimple } from "@phosphor-icons/react";
 
-
-
 export function DropdownContent({titulo, dias, horario, descricao, celular, email}) {
   const [isOpen, setIsOpen] = useState(false);
 
