@@ -13,6 +13,7 @@ export default function EventGalery() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const [fotos, setFotos] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -218,17 +219,56 @@ export default function EventGalery() {
         </div>
       )}
 
-      <button
-        onClick={handleOpenNew}
-        disabled={isUploading}
-        className={`fixed bottom-20 right-5 shadow-md rounded-full p-4 transition-opacity ${
-          isUploading 
-            ? "bg-gray-400 cursor-not-allowed" 
-            : "bg-vermelho dark:bg-vermelho-dark hover:opacity-90"
-        }`}
-      >
-        <Plus className="text-branco" size={30} />
-      </button>
+      <div className="fixed bottom-20 right-5 flex flex-col items-end gap-3 z-40">
+        <div
+          className={`flex flex-col gap-3 transition-all duration-300 ease-in-out origin-bottom ${
+            isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4 pointer-events-none"
+          }`}
+        >
+          <button
+            onClick={() => {
+              handleOpenNew();
+              setIsMenuOpen(false);
+            }}
+            disabled={isUploading}
+            className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
+          >
+            <span className="pl-3 text-sm font-medium text-branco">Adicionar</span>
+            <div className={`p-2 rounded-full text-vermelho ${isUploading ? "bg-gray-400" : "bg-branco"}`}>
+              <Plus size={20} />
+            </div>
+          </button>
+
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
+          >
+            <span className="pl-3 text-sm font-medium text-branco">Carrossel</span>
+            <div className="bg-branco p-2 rounded-full text-vermelho">
+              <ImagesSquareIcon size={20} />
+            </div>
+          </button>
+
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="flex items-center gap-3 p-2 bg-vermelho rounded-full justify-between shadow-lg hover:bg-vermelho-opaci transition-colors"
+          >
+            <span className="pl-3 text-sm font-medium text-branco">Excluir</span>
+            <div className="bg-branco p-2 rounded-full text-vermelho">
+              <TrashIcon size={20} />
+            </div>
+          </button>
+        </div>
+
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className={`shadow-lg rounded-full p-4 transition-transform duration-300 ${
+            isMenuOpen ? "rotate-90" : "rotate-0"
+          } bg-vermelho hover:opacity-90`}
+        >
+          <DotsThreeOutlineVerticalIcon className="text-branco" size={30} weight="fill" />
+        </button>
+      </div>
 
       <ModalGaleria
         isOpen={modalVisivel}
