@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { CaretUp, CaretDown, X, Plus, DotsThreeOutlineVerticalIcon, TrashIcon, ImagesSquareIcon } from "@phosphor-icons/react";
+import { CaretUp, CaretDown, X, Plus, DotsThreeOutlineVerticalIcon, TrashIcon, ImagesSquareIcon, CheckCircle } from "@phosphor-icons/react";
 import { ModalGaleria } from "../components/modalGaleria";
-import { getGaleriaEvento, addMidia } from "../services/authService";
+import { DeleteOptionsModal } from "../components/deleteOptionsModal";
+import { getGaleriaEvento, addMidia, deleteMidia } from "../services/authService";
 
 export default function EventGalery() {
   const location = useLocation();
@@ -12,11 +13,15 @@ export default function EventGalery() {
   const [isVideosOpen, setIsVideosOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const [fotos, setFotos] = useState([]);
   const [videos, setVideos] = useState([]);
+
+  const [modoExclusao, setModoExclusao] = useState(false);
+  const [itensSelecionados, setItensSelecionados] = useState([]);
 
   async function fetchMidias() {
     if (evento?.agendaevento_id) {
@@ -53,7 +58,14 @@ export default function EventGalery() {
     
     let dataFormatada = "sem_data";
     if (evento.data) {
-        dataFormatada = evento.data.split('T')[0].split('-').reverse().join('_');
+        const dataObj = new Date(evento.data);
+        
+        if (!isNaN(dataObj.getTime())) {
+            const dia = String(dataObj.getDate()).padStart(2, '0');
+            const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+            const ano = dataObj.getFullYear();
+            dataFormatada = `${dia}_${mes}_${ano}`;
+        }
     }
 
     let horario = formataHora(evento.horario);
@@ -111,6 +123,49 @@ export default function EventGalery() {
     }
   };
 
+  const ativarModoExclusao = () => {
+    setModoExclusao(true);
+    setIsPhotosOpen(true);
+    setIsVideosOpen(true);
+    setIsMenuOpen(false);
+  };
+
+  const cancelarModoExclusao = () => {
+    setModoExclusao(false);
+    setItensSelecionados([]);
+  };
+
+  const toggleSelecao = (id) => {
+    setItensSelecionados(prev => 
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+    );
+  };
+
+  const handleExcluirSelecionados = () => {
+    if (itensSelecionados.length === 0) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmarExclusao = async () => {
+    setIsUploading(true);
+    setIsDeleteModalOpen(false);
+
+    try {
+      for (const id of itensSelecionados) {
+        await deleteMidia(id);
+      }
+      
+      alert("Mídias excluídas com sucesso!");
+      cancelarModoExclusao();
+      fetchMidias();
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao excluir as mídias.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <>
       <div className="pt-5 px-4 flex flex-col items-center gap-6 pb-24">
@@ -138,13 +193,21 @@ export default function EventGalery() {
             <div className="overflow-hidden min-h-0">
               <div className="px-5 pb-4 pt-2 grid grid-cols-2 gap-4">
                 {fotos.map((foto) => (
-                  <img
-                    key={foto.id}
-                    src={foto.url_arquivo}
-                    alt="Foto do evento"
-                    onClick={() => setSelectedImage(foto.url_arquivo)}
-                    className="w-full h-20 object-cover rounded-xl cursor-pointer"
-                  />
+                  <div key={foto.id} className="relative">
+                    <img
+                      src={foto.url_arquivo}
+                      alt="Foto do evento"
+                      onClick={() => modoExclusao ? toggleSelecao(foto.id) : setSelectedImage(foto.url_arquivo)}
+                      className={`w-full h-20 object-cover rounded-xl cursor-pointer transition-all ${
+                        modoExclusao && itensSelecionados.includes(foto.id) 
+                          ? "border-4 border-vermelho dark:border-vermelho-dark opacity-60" 
+                          : ""
+                      }`}
+                    />
+                    {modoExclusao && itensSelecionados.includes(foto.id) && (
+                      <CheckCircle weight="fill" size={24} className="absolute top-1 right-1 text-vermelho dark:text-vermelho-dark bg-branco rounded-full" />
+                    )}
+                  </div>
                 ))}
                 
                 {fotos.length === 0 && (
@@ -178,14 +241,28 @@ export default function EventGalery() {
             <div className="overflow-hidden min-h-0">
               <div className="px-5 pb-4 pt-2 flex flex-col gap-4">
                 {videos.map((video) => (
-                  <video 
-                    key={video.id} 
-                    controls 
-                    className="w-full h-40 bg-black rounded-xl object-cover"
-                  >
-                    <source src={video.url_arquivo} type="video/mp4" />
-                    Seu navegador não suporta vídeos.
-                  </video>
+                  <div key={video.id} className="relative w-full h-40">
+                    {modoExclusao && (
+                      <div 
+                        className="absolute inset-0 z-10 cursor-pointer rounded-xl bg-transparent"
+                        onClick={() => toggleSelecao(video.id)}
+                      />
+                    )}
+                    <video 
+                      controls={!modoExclusao} 
+                      className={`w-full h-full bg-black rounded-xl object-cover transition-all ${
+                        modoExclusao && itensSelecionados.includes(video.id) 
+                          ? "border-4 border-vermelho dark:border-vermelho-dark opacity-60" 
+                          : ""
+                      }`}
+                    >
+                      <source src={video.url_arquivo} type="video/mp4" />
+                      Seu navegador não suporta vídeos.
+                    </video>
+                    {modoExclusao && itensSelecionados.includes(video.id) && (
+                      <CheckCircle weight="fill" size={32} className="absolute top-2 right-2 z-20 text-vermelho dark:text-vermelho-dark bg-branco rounded-full" />
+                    )}
+                  </div>
                 ))}
 
                 {videos.length === 0 && (
@@ -220,54 +297,79 @@ export default function EventGalery() {
       )}
 
       <div className="fixed bottom-20 right-5 flex flex-col items-end gap-3 z-40">
-        <div
-          className={`flex flex-col gap-3 transition-all duration-300 ease-in-out origin-bottom ${
-            isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4 pointer-events-none"
-          }`}
-        >
-          <button
-            onClick={() => {
-              handleOpenNew();
-              setIsMenuOpen(false);
-            }}
-            disabled={isUploading}
-            className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
-          >
-            <span className="pl-3 text-sm font-medium text-branco">Adicionar</span>
-            <div className={`p-2 rounded-full text-vermelho ${isUploading ? "bg-gray-400" : "bg-branco"}`}>
-              <Plus size={20} />
-            </div>
-          </button>
+        {modoExclusao ? (
+          <>
+            <button
+              onClick={cancelarModoExclusao}
+              className="bg-gray-500 shadow-lg rounded-full p-4 hover:opacity-90 transition-opacity flex items-center justify-center"
+            >
+              <X className="text-branco" size={30} />
+            </button>
 
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
-          >
-            <span className="pl-3 text-sm font-medium text-branco">Carrossel</span>
-            <div className="bg-branco p-2 rounded-full text-vermelho">
-              <ImagesSquareIcon size={20} />
-            </div>
-          </button>
+            <button
+              onClick={handleExcluirSelecionados}
+              disabled={isUploading || itensSelecionados.length === 0}
+              className={`shadow-lg rounded-full p-4 transition-opacity flex items-center justify-center ${
+                isUploading || itensSelecionados.length === 0
+                  ? "bg-gray-400 cursor-not-allowed" 
+                  : "bg-vermelho dark:bg-vermelho-dark hover:opacity-90"
+              }`}
+            >
+              <TrashIcon className="text-branco" size={30} />
+            </button>
+          </>
+        ) : (
+          <>
+            <div
+              className={`flex flex-col gap-3 transition-all duration-300 ease-in-out origin-bottom ${
+                isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4 pointer-events-none"
+              }`}
+            >
+              <button
+                onClick={() => {
+                  handleOpenNew();
+                  setIsMenuOpen(false);
+                }}
+                disabled={isUploading}
+                className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
+              >
+                <span className="pl-3 text-sm font-medium text-branco">Adicionar</span>
+                <div className={`p-2 rounded-full text-vermelho ${isUploading ? "bg-gray-400" : "bg-branco"}`}>
+                  <Plus size={20} />
+                </div>
+              </button>
 
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            className="flex items-center gap-3 p-2 bg-vermelho rounded-full justify-between shadow-lg hover:bg-vermelho-opaci transition-colors"
-          >
-            <span className="pl-3 text-sm font-medium text-branco">Excluir</span>
-            <div className="bg-branco p-2 rounded-full text-vermelho">
-              <TrashIcon size={20} />
-            </div>
-          </button>
-        </div>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 p-2 bg-vermelho rounded-full shadow-lg hover:bg-vermelho-opaci transition-colors"
+              >
+                <span className="pl-3 text-sm font-medium text-branco">Carrossel</span>
+                <div className="bg-branco p-2 rounded-full text-vermelho">
+                  <ImagesSquareIcon size={20} />
+                </div>
+              </button>
 
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className={`shadow-lg rounded-full p-4 transition-transform duration-300 ${
-            isMenuOpen ? "rotate-90" : "rotate-0"
-          } bg-vermelho hover:opacity-90`}
-        >
-          <DotsThreeOutlineVerticalIcon className="text-branco" size={30} weight="fill" />
-        </button>
+              <button
+                onClick={ativarModoExclusao}
+                className="flex items-center gap-3 p-2 bg-vermelho rounded-full justify-between shadow-lg hover:bg-vermelho-opaci transition-colors"
+              >
+                <span className="pl-3 text-sm font-medium text-branco">Excluir</span>
+                <div className="bg-branco p-2 rounded-full text-vermelho">
+                  <TrashIcon size={20} />
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`shadow-lg rounded-full p-4 transition-transform duration-300 ${
+                isMenuOpen ? "rotate-90" : "rotate-0"
+              } bg-vermelho hover:opacity-90 flex items-center justify-center`}
+            >
+              <DotsThreeOutlineVerticalIcon className="text-branco" size={30} weight="fill" />
+            </button>
+          </>
+        )}
       </div>
 
       <ModalGaleria
@@ -275,6 +377,15 @@ export default function EventGalery() {
         onClose={handleCloseModal}
         onSave={handleSaveMidias}
         agendaevento_id={evento?.agendaevento_id}
+      />
+
+      <DeleteOptionsModal
+        visible={isDeleteModalOpen}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onDeleteAll={confirmarExclusao}
+        title={`Deseja excluir ${itensSelecionados.length} mídia(s)?`}
+        textAll="Sim, excluir"
+        hideOne={true}
       />
     </>
   );

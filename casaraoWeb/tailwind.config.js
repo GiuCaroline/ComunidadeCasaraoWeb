@@ -18,7 +18,7 @@ export default {
         },
         'input': {
           DEFAULT: '#F0F0F0',
-          dark: '#646464',
+          dark: '#1c1d1f',
         },
         'placeInput': '#5e5e5e',
         'vermelho': {
