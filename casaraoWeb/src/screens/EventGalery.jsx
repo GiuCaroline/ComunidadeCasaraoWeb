@@ -1,13 +1,28 @@
 import { useState } from "react";
-import { CaretUp, CaretDown, X } from "@phosphor-icons/react";
+import { CaretUp, CaretDown, X, Plus } from "@phosphor-icons/react";
 import logoPreta from "/images/logoPreto.png";
 import image from "/images/image.png";
 import jake from "/images/jake.webp";
+import { ModalGaleria } from "../components/modalGaleria";
 
 export default function EventGalery() {
   const [isPhotosOpen, setIsPhotosOpen] = useState(false);
   const [isVideosOpen, setIsVideosOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [modalVisivel, setModalVisivel] = useState(false);
+
+  const handleOpenNew = () => {
+    setModalVisivel(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisivel(false);
+  };
+
+  const handleSaveMidias = (midias) => {
+    console.log("Mídias selecionadas: ", midias);
+    setModalVisivel(false);
+  };
 
   return (
     <>
@@ -116,6 +131,19 @@ export default function EventGalery() {
           />
         </div>
       )}
+
+      <button
+        onClick={handleOpenNew}
+        className="fixed bottom-20 right-5 bg-vermelho dark:bg-vermelho-dark shadow-md rounded-full p-4 hover:opacity-90 transition-opacity"
+      >
+        <Plus className="text-branco" size={30} />
+      </button>
+
+      <ModalGaleria
+        isOpen={modalVisivel}
+        onClose={handleCloseModal}
+        onSave={handleSaveMidias}
+      />
     </>
   );
 }
