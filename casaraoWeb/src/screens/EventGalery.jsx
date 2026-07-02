@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { CaretUp, CaretDown, X, Plus, DotsThreeOutlineVerticalIcon, TrashIcon, ImagesSquareIcon, CheckCircle } from "@phosphor-icons/react";
+import { CaretUp, CaretDown, X, Plus, DotsThreeOutlineVerticalIcon, TrashIcon, ImagesSquareIcon, CheckCircle, Star } from "@phosphor-icons/react";
 import { ModalGaleria } from "../components/modalGaleria";
 import { DeleteOptionsModal } from "../components/deleteOptionsModal";
 import { getGaleriaEvento, addMidia, deleteMidia, updateDestaqueCarrossel } from "../services/authService";
@@ -25,6 +25,7 @@ export default function EventGalery() {
 
   const [modoCarrossel, setModoCarrossel] = useState(false);
   const [selecoesCarrossel, setSelecoesCarrossel] = useState([]);
+
   const toggleSelecaoCarrossel = (id) => {
     const index = selecoesCarrossel.findIndex(item => item.id === id);
     
@@ -39,9 +40,28 @@ export default function EventGalery() {
   };
 
   const salvarConfiguracaoCarrossel = async () => {
-    console.log("Salvando carrossel:", selecoesCarrossel);
-    alert("Carrossel atualizado!");
-    setModoCarrossel(false);
+    setIsUploading(true);
+
+    try {
+      const fotosParaRemover = fotos.filter(foto => !selecoesCarrossel.some(s => s.id === foto.id));
+      
+      for (const foto of fotosParaRemover) {
+        await updateDestaqueCarrossel(foto.id, { destaque_carrossel: false });
+      }
+
+      for (const item of selecoesCarrossel) {
+        await updateDestaqueCarrossel(item.id, { destaque_carrossel: true });
+      }
+
+      alert("Carrossel atualizado com sucesso!");
+      setModoCarrossel(false);
+      fetchMidias();
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao salvar a configuração do carrossel.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   async function fetchMidias() {
@@ -49,11 +69,20 @@ export default function EventGalery() {
       try {
         const data = await getGaleriaEvento(evento.agendaevento_id);
         
-        const imagensFiltradas = data.filter(item => item.tipo_arquivo === 'imagem');
+        const imagensFiltradas = data
+          .filter(item => item.tipo_arquivo === 'imagem')
+          .sort((a, b) => (b.destaque_carrossel === true ? 1 : 0) - (a.destaque_carrossel === true ? 1 : 0));
+
         const videosFiltrados = data.filter(item => item.tipo_arquivo === 'video');
         
         setFotos(imagensFiltradas);
         setVideos(videosFiltrados);
+
+        const destaquesIniciais = imagensFiltradas
+          .filter(foto => foto.destaque_carrossel)
+          .map((foto, index) => ({ id: foto.id, ordem: index + 1 }));
+        setSelecoesCarrossel(destaquesIniciais);
+
       } catch (error) {
         console.error(error);
       }
@@ -156,6 +185,10 @@ export default function EventGalery() {
     setItensSelecionados([]);
   };
 
+  const cancelarModoCarrossel = () => {
+    setModoCarrossel(false);
+  };
+
   const toggleSelecao = (id) => {
     setItensSelecionados(prev => 
       prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
@@ -232,6 +265,11 @@ export default function EventGalery() {
                     {modoCarrossel && selecoesCarrossel.find(s => s.id === foto.id) && (
                       <div className="absolute top-1 right-1 bg-vermelho text-branco rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs">
                         {selecoesCarrossel.find(s => s.id === foto.id).ordem}
+                      </div>
+                    )}
+                    {!modoCarrossel && foto.destaque_carrossel && (
+                      <div className="absolute top-1 right-1 bg-vermelho rounded-full p-1 shadow-md">
+                        <Star weight="fill" size={16} className="text-branco" />
                       </div>
                     )}
                   </div>
@@ -325,9 +363,24 @@ export default function EventGalery() {
 
       <div className="fixed bottom-20 right-5 flex flex-col items-end gap-3 z-40">
         {modoCarrossel ? (
-           <button onClick={salvarConfiguracaoCarrossel} className="bg-vermelho text-branco rounded-full p-4 shadow-xl">
-             Salvar
-           </button>
+          <>
+            <div className="flex flex-row gap-5">
+              <button
+                onClick={cancelarModoCarrossel}
+                className="bg-gray-500 shadow-lg rounded-full p-4 hover:opacity-90 transition-opacity flex items-center justify-center"
+              >
+                <X className="text-branco" size={30} />
+              </button>
+              <button 
+                onClick={salvarConfiguracaoCarrossel} 
+                disabled={isUploading}
+                className={`text-branco rounded-full p-4 shadow-xl ${isUploading ? "bg-gray-400 cursor-not-allowed" : "bg-vermelho"}`}
+              >
+                Salvar
+              </button>
+            </div>
+          </>
+          
         ) : ( modoExclusao ? (
               <>
                 <button

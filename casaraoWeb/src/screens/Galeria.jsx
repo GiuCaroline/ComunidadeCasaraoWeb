@@ -4,38 +4,40 @@ import { useNavigate } from "react-router-dom";
 import { getGaleriaEventos } from "../services/authService";
 
 export default function Galeria() {
-    const navigate = useNavigate();
-    const [eventos, setEventos] = useState([]);
+  const navigate = useNavigate();
+  const [eventos, setEventos] = useState([]);
 
-    useEffect(() => {
-        async function fetchEventos() {
-            try {
-                const data = await getGaleriaEventos();
-                setEventos(data);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        fetchEventos();
-    }, []);
-
-    function handleOpen(evento) {
-        navigate("/eventgalery", { state: { evento } });
+  useEffect(() => {
+    async function fetchEventos() {
+      try {
+        const data = await getGaleriaEventos();
+        const agora = new Date();
+        const eventosPassados = data.filter((evento) => new Date(evento.data) < agora);
+        setEventos(eventosPassados);
+      } catch (error) {
+        console.error(error);
+      }
     }
+    fetchEventos();
+  }, []);
 
-    return (
+  function handleOpen(evento) {
+    navigate("/eventgalery", { state: { evento } });
+  }
+
+  return (
         <div className="pt-5 px-4 flex flex-col items-center gap-6 pb-24">
             <div className="relative w-[95%]">
                 <input
-                    type="text"
-                    placeholder="Pesquisar..."
-                    onChange={(e) => console.log('Pesquisa: ', e.target.value)}
-                    className="w-full text-preto dark:text-branco py-3 px-4 pr-12 rounded-full bg-input dark:bg-input-dark shadow-md outline-none"
+                type="text"
+                placeholder="Pesquisar..."
+                onChange={(e) => console.log('Pesquisa: ', e.target.value)}
+                className="w-full text-preto dark:text-branco py-3 px-4 pr-12 rounded-full bg-input dark:bg-input-dark shadow-md outline-none"
                 />
-        
+                
                 <MagnifyingGlass
-                    size={22}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-preto dark:text-branco"
+                size={22}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-preto dark:text-branco"
                 />
             </div>
 
