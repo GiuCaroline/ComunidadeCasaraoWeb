@@ -27,6 +27,20 @@ export async function deleteUser(id) {
   }
 }
 
+export async function loginUser(email, password) {
+  try {
+    const response = await api.post("/auth/login", {
+      email: email.toLowerCase().trim(),
+      password,
+    });
+
+    return response.data;
+
+  } catch (error) {
+    throw error.response?.data || { error: "Erro no servidor" };
+  }
+}
+
 export async function getCargos(data) {
   try {
     const response = await api.get("/auth/cargos", data);

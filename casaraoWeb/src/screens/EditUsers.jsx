@@ -174,7 +174,7 @@ export default function EditUsers() {
   const [mae, setMae] = useState(user?.mae || "");
   const [pai, setPai] = useState(user?.pai || "");
   const [endereco, setEndereco] = useState(user?.endereco || "");
-  const [departamento, setDepartamento] = useState(user?.departamento ? String(user.departamento) : "");
+  const [departamento, setDepartamento] = useState(user?.departamento_id ? String(user.departamento_id) : "");
   const [corEscala, setCorEscala] = "";
   const [cep, setCep] = useState(user?.cep || "");
   const [uf, setUf] = useState(user?.uf || "");
@@ -233,6 +233,7 @@ export default function EditUsers() {
         membro: membro ? formatarDataBackend(membro) : null,
         batismo: batismo ? formatarDataBackend(batismo) : null,
         email: email || null,
+        departamento_id: departamento || null,
       };
 
       await updateUser(user.id, payload);
@@ -304,27 +305,13 @@ export default function EditUsers() {
       ))}
 
       {cargosAtivos.includes("5") && (
-        <div className="flex items-center gap-4 w-[95%] mb-[7%]">
-          <div className="w-1/2">
-            <Dropdown
-              data={departamentos}
-              value={departamento}
-              placeholder="Departamento"
-              onChange={(item) => setDepartamento(item.value)}
-            />
-          </div>
-
-          <div className="w-1/2 flex flex-col mt-[-12%]">
-            <label className="text-sm text-[#5e5e5e] dark:text-[#a5a5a5] mb-1">
-              Cor da Escala
-            </label>
-            <input
-              type="color"
-              value={corEscala}
-              onChange={(e) => setCorEscala(e.target.value)}
-              className="h-[48px] w-full rounded-xl cursor-pointer"
-            />
-          </div>
+        <div className="flex justify-center w-full">
+          <Dropdown
+            data={departamentos}
+            value={departamento}
+            placeholder="Departamento"
+            onChange={(item) => setDepartamento(item.value)}
+          />
         </div>
       )}
 

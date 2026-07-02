@@ -1,17 +1,31 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "../components/input";
-import { useNavigate } from "react-router-dom"
 import logoPreta from "/images/logoPreto.png";
 import logoBranca from "/images/logoBranco.png";
+import { loginUser } from "../services/authService";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
-    console.log(email, senha);
+
+    if (!email || !senha) return;
+
+    try {
+      const data = await loginUser(email, senha);
+
+      login(data.user);
+
+      navigate("/menu");
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -32,7 +46,7 @@ export default function Login() {
         onSubmit={handleLogin}
         className="bg-transparent p-8 w-[400px] flex flex-col items-center mt-[5%]"
       >
-        <h1 className="text-2xl font-bold mb-[25%] text-vermelho dark:text-vermelho-dark">Login</h1>
+        <h1 className="text-2xl font-semibold mb-[15%] text-vermelho dark:text-vermelho-dark">Login</h1>
 
         <Input
           texto="Email"
@@ -48,18 +62,17 @@ export default function Login() {
           seguranca={true}
         />
 
-        <div className="items-start flex">
+        <div className="items-start w-full ml-[6%] flex">
           <a><p className="text-placeInput text-sm">Esqueci minha senha</p></a>
         </div>
 
         <button
           type="submit"
-          onClick={() => navigate("/menu")}
-          className="mt-6 bg-primary text-branco bg-vermelho py-3 px-20 rounded-full hover:opacity-90 transition"
+          className="mt-[15%] bg-primary text-branco bg-vermelho py-3 px-20 rounded-full hover:opacity-90 transition"
         >
           Entrar
         </button>
       </form>
     </div>
-  )
+  );
 }
