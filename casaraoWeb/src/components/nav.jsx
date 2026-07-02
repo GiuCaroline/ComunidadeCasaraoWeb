@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { List, X, ArrowLeft, Sun, Moon } from "@phosphor-icons/react";
+import { List, X, ArrowLeft, Sun, Moon, SignOutIcon } from "@phosphor-icons/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoPreta from "/images/logoPreto.png";
 import logoBranca from "/images/logoBranco.png";
@@ -26,6 +26,7 @@ export function Nav() {
     "/escalas": "Escalas",
     "/cursos": "Cursos",
     "/perfil": "Perfil",
+    "/login": "Login",
   };
 
   const currentTitle = routeNames[location.pathname];
@@ -146,6 +147,7 @@ export function Nav() {
           <Link to="/escalas" onClick={() => setOpen(false)}>Escalas</Link>
           <Link to="/cursos" onClick={() => setOpen(false)}>Cursos</Link>
           <Link to="/perfil" onClick={() => setOpen(false)}>Perfil</Link>
+          <Link to="/login" onClick={() => setOpen(false)}><SignOutIcon size={25} className="text-vermelho dark:text-vermelho-dark" /></Link>
         </div>
       </div>
     </>
